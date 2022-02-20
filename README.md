@@ -56,7 +56,6 @@ Note that the package will need to be added to your PATH environmental variable,
 
 ```
 pip3 install pyserial, waitress
-
 ```
 Note that sudo may be required to access the serial port. If so, be sure to run the above pip3 install using sudo as well.
 
