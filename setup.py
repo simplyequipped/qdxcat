@@ -8,7 +8,7 @@ setup(
     author='Simply Equipped LLC',
     author_email='info@simplyequipped.com',
     packages=['qdx'],
-    install_requires=['pyserial', 'flask', 'waitress']
+    install_requires=['pyserial']
 )
 
 user = subprocess.check_output(['whoami']).decode('utf-8').strip()
@@ -16,7 +16,7 @@ groups = subprocess.check_output(['groups']).decode('utf-8').strip().split()[1:]
 
 if 'dialout' not in groups:
     print('User \'' + user + '\' is not a member of the \'dialout\' group, which allows serial port access.')
-    dialout_setup = input('Would you like to add \'' + user + '\' to the \'dialout\' group now? (yes/no): ')
+    dialout_setup = input('Would you like to add \'' + user + '\' to the \'dialout\' group now? (Y/n): ')
 
     if dialout_setup.lower() in ['yes', 'y', '']:
         print('\nYou will be prompted for your sudo password now.')
