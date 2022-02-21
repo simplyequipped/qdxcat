@@ -101,7 +101,10 @@ class QDX:
         if self.port != None:
             for cmd in self.commands:
                 if cmd['get'] != None and cmd['cmd'] not in ignore_cmd:
-                    self.settings[cmd['cmd']] = {'value': cmd['get'](), 'label': cmd['label'], 'unit': cmd['unit'], 'map': cmd['map']}
+                    try:
+                        self.settings[cmd['cmd']] = {'value': cmd['get'](), 'label': cmd['label'], 'unit': cmd['unit'], 'map': cmd['map']}
+                    except Exception as e:
+                        print(cmd['cmd'] + ': ' + e)
 
     def __serial_request(self, cmd, value = None):
         if value != None:
