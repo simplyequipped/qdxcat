@@ -117,7 +117,11 @@ class QDX:
         
                 response = b''
                 if serial_port.in_waiting:
-                    response = serial_port.read_until(expected=b';')
+                    # handle pyserial library change in version 3.5
+                    if float(serial.__version__) >= 3.5:
+                        response = serial_port.read_until(expected=b';')
+                    else:
+                        response = serial_port.read_until(terminator=b';')
         except Exception as e:
             raise Exception('Error with serial port ' + self.port + ', check device connection')
         
@@ -128,6 +132,9 @@ class QDX:
         response = response[2:-1]
         return response
     
+    # TODO check if some command reaponses should be float instead of int, error could be :
+    # 'invalid literal for int() with base 10'
+
     # TODO CAT command not working
     def get_af_gain(self):
         gain = self.__serial_request(self.AF_GAIN['cmd'])
