@@ -1,6 +1,6 @@
 import waitress
 
-from qdx.cat import QDX
+from qdx.qdx import QDX
 from qdx import server
 #from qdx import modem
 
