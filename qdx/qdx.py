@@ -104,13 +104,15 @@ class QDX:
                     try:
                         self.settings[cmd['cmd']] = {'value': cmd['get'](), 'label': cmd['label'], 'unit': cmd['unit'], 'map': cmd['map']}
                     except Exception as e:
-                        print(cmd['cmd'] + ': ' + e)
+                        print(cmd['cmd'] + ': ' + str(e))
 
     def __serial_request(self, cmd, value = None):
+        # build command string
         if value != None:
             request = str(cmd) + str(value) + ';'
         else:
             request = str(cmd) + ';'
+        # encode command string to bytes
         request = request.encode('utf-8')
 
         try:
@@ -128,11 +130,17 @@ class QDX:
         except Exception as e:
             raise Exception('Error with serial port ' + self.port + ', check device connection')
         
+        # decode bytes to response string
         response = response.decode('utf-8')
+
+        # remove empty byte at the end of some returned values
+        response = response.replace('\x00', '')
+        # stop processing if the device did not understand the command
         if response == '?;':
             return None
-        # remove leading command str and trailing semicolon
+        # remove leading command string and trailing semicolon
         response = response[2:-1]
+
         return response
     
     # TODO check if some command reaponses should be float instead of int, error could be :
@@ -207,7 +215,7 @@ class QDX:
         return bw
 
     def get_radio_id(self):
-        radio_id = self.__serial_request(self.RADIO_ID)
+        radio_id = self.__serial_request(self.RADIO_ID['cmd'])
         if radio_id != None:
             radio_id = int(radio_id)
         return radio_id
@@ -252,151 +260,126 @@ class QDX:
         value = int(value)
         self.__serial_request(self.OPERATING_MODE['cmd'], value)
 
-    # TODO CAT command not working
     def get_txco_freq(self):
         freq = self.__serial_request(self.TXCO_FREQ['cmd'])
         if freq != None:
             freq = int(freq)
         return freq
 
-    # TODO CAT command not working
     def set_txco_freq(self, value):
         value = int(value)
         self.__serial_request(self.TXCO_FREQ['cmd'], value)
 
-    # TODO CAT command not working
     def get_sideband(self):
         sideband = self.__serial_request(self.SIDEBAND['cmd'])
         if sideband != None:
             sideband = int(sideband)
         return sideband
 
-    # TODO CAT command not working
     def set_sideband(self, value):
         value = int(value)
         self.__serial_request(self.SIDEBAND['cmd'], value)
 
-    # TODO CAT command not working
     def get_default_freq(self):
         freq = self.__serial_request(self.DEFAULT_FREQ['cmd'])
         if freq != None:
             freq = int(freq)
         return freq
 
-    # TODO CAT command not working
     def set_default_freq(self, value):
         value = int(value)
         self.__serial_request(self.DEFAULT_FREQ['cmd'], value)
 
-    # TODO CAT command not working
     def get_rx_gain(self):
         gain = self.__serial_request(self.RX_GAIN['cmd'])
         if gain != None:
             gain = int(gain)
         return gain
 
-    # TODO CAT command not working
     def set_rx_gain(self, value):
         value = int(value)
         self.__serial_request(self.RX_GAIN['cmd'], value)
 
-    # TODO CAT command not working
     def get_vox_enable(self):
         vox = self.__serial_request(self.VOX_EN['cmd'])
         if vox != None:
             vox = int(vox)
         return vox
 
-    # TODO CAT command not working
     def set_vox_enable(self, value):
         value = int(value)
         self.__serial_request(self.VOX_EN['cmd'], value)
 
-    # TODO CAT command not working
     def get_tx_rise_threshold(self):
         threshold = self.__serial_request(self.TX_RISE['cmd'])
         if threshold != None:
             threshold = int(threshold)
         return threshold
 
-    # TODO CAT command not working
     def set_tx_rise_threshold(self, value):
         value = int(value)
         self.__serial_request(self.TX_RISE['cmd'], value)
 
-    # TODO CAT command not working
     def get_tx_fall_threshold(self):
         threshold = self.__serial_request(self.TX_FALL['cmd'])
         if threshold != None:
             threshold = int(threshold)
         return threshold
 
-    # TODO CAT command not working
     def set_tx_fall_threshold(self, value):
         value = int(value)
         self.__serial_request(self.TX_FALL['cmd'], value)
 
-    # TODO CAT command not working
     def get_cycle_min_parameter(self):
         parameter = self.__serial_request(self.CYCLE_MIN['cmd'])
         if parameter != None:
             parameter = int(parameter)
         return parameter
 
-    # TODO CAT command not working
     def set_cycle_min_parameter(self, value):
         value = int(value)
         self.__serial_request(self.CYCLE_MIN['cmd'], value)
 
-    # TODO CAT command not working
     def get_sample_min_parameter(self):
         parameter = self.__serial_request(self.SAMPLE_MIN['cmd'])
         if parameter != None:
             parameter = int(parameter)
         return parameter
 
-    # TODO CAT command not working
     def set_sample_min_parameter(self, value):
         value = int(value)
         self.__serial_request(self.SAMPLE_MIN['cmd'], value)
 
-    # TODO CAT command not working
     def get_discard_parameter(self):
         parameter = self.__serial_request(self.DISCARD['cmd'])
         if parameter != None:
             parameter = int(parameter)
         return parameter
 
-    # TODO CAT command not working
     def set_discard_parameter(self, value):
         value = int(value)
         self.__serial_request(self.DISCARD['cmd'], value)
 
-    # TODO CAT command not working
     def get_iq_mode(self):
         mode = self.__serial_request(self.IQ_MODE['cmd'])
         if mode != None:
             mode = int(mode)
         return mode
 
-    # TODO CAT command not working
     def set_iq_mode(self, value):
         value = int(value)
         self.__serial_request(self.IQ_MODE['cmd'], value)
 
-    # TODO CAT command not working
     def get_japan_band_limit_mode(self):
         mode = self.__serial_request(self.JAPAN_BAND_LIM['cmd'])
         if mode != None:
             mode = int(mode)
         return mode
 
-    # TODO CAT command not working
     def set_japan_band_limit_mode(self, value):
         value = int(value)
         self.__serial_request(self.JAPAN_BAND_LIM['cmd'], value)
 
-    # TODO no RIT get method supported per QDX docs
     def set_negative_rit_offset(self, value):
         value = int(value)
         self.__serial_request(self.NEG_RIT_OFFSET['cmd'], value)
@@ -407,12 +390,11 @@ class QDX:
             status = int(status)
         return status
     
-    # TODO no RIT get method supported per QDX docs
     def set_positive_rit_offset(self, value):
         value = int(value)
         self.__serial_request(self.POS_RIT_OFFSET['cmd'], value)
 
-    def set_rx(self):
+    def set_rx(self, value):
         self.__serial_request(self.RX_MODE['cmd'])
 
     def get_split_mode(self):
@@ -435,7 +417,7 @@ class QDX:
         value = int(value)
         self.__serial_request(self.TX_STATE['cmd'], value)
 
-    def set_tx(self):
+    def set_tx(self, value):
         self.__serial_request(self.TX_MODE['cmd'])
 
 
