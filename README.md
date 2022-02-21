@@ -42,7 +42,7 @@ Clone this repo and install the package:
 ```
 git clone https://github.com/simplyequipped/qdx
 cd qdx
-python3 setup.py easy_install
+python3 setup.py install
 ```
 
 The only dependency is the Python serial package which can be installed manually if needed:
