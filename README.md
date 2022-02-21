@@ -6,22 +6,26 @@ The qdx pacakge default is to auto discover the QDX device when using a Linux sy
 
 Auto discovery:
 ```
+import qdx
 radio = qdx.QDX()
 ```
 
 Specify a serial port:
 ```
+import qdx
 radio = qdx.QDX(port = '/dev/ttyUSB0')
 ```
 
 Disable auto discovery, specify a serial port later:
 ```
+import qdx
 radio = qdx.QDX(discovery = False)
 radio.set_port('/dev/ttyUSB0')
 ```
 
 Disable auto discovery, auto discover later:
 ```
+import qdx
 radio = qdx.QDX(discovery = False)
 radio.discover()
 ```
