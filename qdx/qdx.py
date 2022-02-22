@@ -1,11 +1,10 @@
-#import re, subprocess, time
 import os, sys, time
 import serial
 
 class QDX:
 
 
-    def __init__(self, port = None, discover = True):
+    def __init__(self, port = None, detect = True):
         # QDX CAT commands
         # Kenwood TS-480/TS-440 command set
         self.AF_GAIN         = {'cmd': 'AG', 'get': self.get_af_gain,               'set': self.set_af_gain,                'label': 'Audio Gain',          'unit': '',     'map': None} 
@@ -49,10 +48,10 @@ class QDX:
 
         self.settings = {}
 
-        if self.port == None and discover == True:
-            self.discover()
+        if self.port == None and detect == True:
+            self.detect()
 
-    def discover(self):
+    def detect(self):
         self.port = None
         if not os.path.isdir('/dev/serial/by-id'):
             raise Exception('QDX device not found, try specifying a serial port')

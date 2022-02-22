@@ -2,9 +2,9 @@
 
 A Python 3 package for working with the [QDX tranceiver from QRP Labs](http://qrp-labs.com/qdx).
 
-The qdx pacakge default is to auto discover the QDX device when using a Linux system (tested on Ubuntu 20.04 and Raspberry Pi OS buster). If the QDX cannot be discovered you can specify a serial port by passing the serial port to the qdx.QDX() constructor. Auto discovery can also be disabled by passing the appropraite information to the qdx.QDX() constructor.
+The default is to auto detect the QDX device when using a Linux system (tested on Ubuntu 20.04 and Raspberry Pi OS buster). If the QDX cannot be detected you can specify a serial port by passing the serial port to the qdx.QDX() constructor. Auto detect can be disabled by passing the appropraite information to the qdx.QDX() constructor, and setting the serial port or auto detecting later.
 
-Auto discovery:
+Auto detect:
 ```
 import qdx
 radio = qdx.QDX()
@@ -16,18 +16,18 @@ import qdx
 radio = qdx.QDX(port = '/dev/ttyUSB0')
 ```
 
-Disable auto discovery, specify a serial port later:
+Disable auto detect, specify a serial port later:
 ```
 import qdx
-radio = qdx.QDX(discovery = False)
+radio = qdx.QDX(detect = False)
 radio.set_port('/dev/ttyUSB0')
 ```
 
-Disable auto discovery, auto discover later:
+Perform auto detect later:
 ```
 import qdx
-radio = qdx.QDX(discovery = False)
-radio.discover()
+radio = qdx.QDX(detect = False)
+radio.detect()
 ```
 
 ### CAT Commands
