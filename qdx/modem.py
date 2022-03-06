@@ -1,4 +1,4 @@
-import os, subprocess, threading, time
+import os, threading, time
 import pexpect
 from pexpect.popen_spawn import PopenSpawn
 
@@ -44,7 +44,8 @@ class MiniModem:
 
     def stop(self):
         self.active = False
-        self.process.sendeof()
+        #TODO how to kill the process?
+        #self.process.kill()
 
 
 class FSKModem:
