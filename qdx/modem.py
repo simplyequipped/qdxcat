@@ -18,6 +18,7 @@ class MiniModem:
         self.baudrate = baudrate
         self.process = None
         self.active = False
+        #TODO handle case of minimodem not installed
         self.execpath = subprocess.check_output(['which', 'minimodem']).decode('utf-8').strip()
 
         self.shellcmd = [
@@ -45,11 +46,7 @@ class MiniModem:
             self.process.kill()
 
 
-
-
-#TODO add alsa_dev_in and alsa_dev_out
-
-class Modem:
+class FSKModem:
     RX      = 'rx'
     TX      = 'tx'
     RXTX    = 'rx/tx'
@@ -160,10 +157,6 @@ class Modem:
             time.sleep(1)
 
 
-if __name__ == '__main__':
-    alsa = input('Enter alsa device (card,device): ')
-    modem = Modem(alsadev = alsa, mode=Modem.RX)
-    print('Modem active')
 
 
 
