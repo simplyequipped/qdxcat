@@ -154,6 +154,7 @@ class FSKModem:
                     pass
 
                 if len(data):
+                    #TODO append data to buffer?
                     print(data)
 
             time.sleep(1)
