@@ -1,5 +1,6 @@
 import os, subprocess, threading, time
-from subprocess import PIPE
+import pexpect
+from pexpect.popen_spawn import PopenSpawn
 
 
 class MiniModem:
@@ -19,31 +20,31 @@ class MiniModem:
         self.process = None
         self.active = False
         #TODO handle case of minimodem not installed
-        self.execpath = subprocess.check_output(['which', 'minimodem']).decode('utf-8').strip()
+        self.execpath = pexpect.which('minimodem')
 
-        self.shellcmd = [
-            self.execpath,
-            '--' + self.mode,
-            '--quiet',
-            '--alsa=' + self.alsa_dev,
-            str(self.baudrate)
-        ]
+        #shellcmd = [
+        #    self.execpath,
+        #    '--' + self.mode,
+        #    '--quiet',
+        #    '--alsa=' + self.alsa_dev,
+        #    str(self.baudrate)
+        #]
+
+        self.shellcmd = '%s --%s --quiet --alsa=%s %s' %(self.execpath, self.mode, self.alsa_dev, self.baudrate)
+
+        #self.shellcmd = ' '.join(shellcmd)
 
         if start:
             self.start()
 
     def start(self):
         if not self.active:
-            self.process = subprocess.Popen(self.shellcmd, stdin=PIPE, stdout=PIPE)
+            self.process = PopenSpawn(self.shellcmd, timeout=None, encoding='utf-8')
             self.active = True
 
     def stop(self):
         self.active = False
-
-        self.process.terminate()
-        self.process.communicate()
-        if self.process.poll() == None:
-            self.process.kill()
+        self.process.sendeof()
 
 
 class FSKModem:
@@ -52,11 +53,14 @@ class FSKModem:
     RXTX    = 'rx/tx'
     MODES = [RX, TX, RXTX]
 
+    #TODO arg for arecord or aplay
     @staticmethod
     def find_alsa_device(search_str='QDX'):
         alsa_dev = None
-        alsa_devs = subprocess.check_output(['arecord', '-l']).decode('utf-8')
-        alsa_devs = alsa_devs.split('\n')
+        cmd = pexpect.spawn('arecord -l')
+        cmd.expect(pexpect.EOF)
+        alsa_devs = cmd.before.decode('utf-8').split('\r\n')
+        cmd.close()
 
         for line in alsa_devs:
             if search_str in line:
@@ -85,7 +89,7 @@ class FSKModem:
         self.tx = None
         self.active = False
 
-        if mode in Modem.MODES:
+        if mode in FSKModem.MODES:
             self.mode = mode
         else:
             raise Exception('Unknown mode \'' + mode + '\'')
@@ -93,10 +97,10 @@ class FSKModem:
         if self.alsa_dev_out == None:
             self.alsa_dev_out = self.alsa_dev_in
 
-        if self.mode in [Modem.RXTX, Modem.RX]:
+        if self.mode in [FSKModem.RXTX, FSKModem.RX]:
             self.rx = MiniModem(MiniModem.RX, self.alsa_dev_in, baudrate=self.baudrate, start=False)
 
-        if self.mode in [Modem.RXTX, Modem.TX]:
+        if self.mode in [FSKModem.RXTX, FSKModem.TX]:
             self.tx = MiniModem(MiniModem.TX, self.alsa_dev_out, baudrate=self.baudrate, start=False)
 
         if start:
@@ -126,16 +130,14 @@ class FSKModem:
         if not self.tx:
             return None
 
-        if not type(data) is bytes:
-            data = data.encode('utf-8')
+        self.tx.process.sendline(data)
 
-        self.tx.process.stdin.write(data)
-
-    def receive(self, size=-1):
+    def receive(self, timeout=0):
         if not self.rx:
             return None
 
-        return self.rx.process.stdout.read(size).decode('utf-8')
+        self.rx.process.expect_exact(pexpect.TIMEOUT, timeout=timeout)
+        return self.rx.process.before
 
     def register_rx_callback(self, func):
         pass
