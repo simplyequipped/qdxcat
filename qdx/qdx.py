@@ -2,44 +2,73 @@ import os, sys, time
 import serial
 
 class QDX:
+    # QDX CAT commands
+    # Kenwood TS-480/TS-440 command set
+    AF_GAIN         = 'AG'
+    SIG_GEN_FREQ    = 'C2'
+    VFO_A           = 'FA'
+    VFO_B           = 'FB'
+    RX_VFO_MODE     = 'FR'
+    TX_VFO_MODE     = 'FT'
+    FILTER_BW       = 'FW'
+    RADIO_ID        = 'ID'
+    RADIO_INFO      = 'IF'
+    OPERATING_MODE  = 'MD'
+    TXCO_FREQ       = 'Q0'
+    SIDEBAND        = 'Q1'
+    DEFAULT_FREQ    = 'Q2'
+    RX_GAIN         = 'Q3'
+    VOX_EN          = 'Q4'
+    TX_RISE         = 'Q5'
+    TX_FALL         = 'Q6'
+    CYCLE_MIN       = 'Q7'
+    SAMPLE_MIN      = 'Q8' 
+    DISCARD         = 'Q9'
+    IQ_MODE         = 'QA'
+    JAPAN_BAND_LIM  = 'QB'
+    NEG_RIT_OFFSET  = 'RD'
+    RIT_STATUS      = 'RT' 
+    POS_RIT_OFFSET  = 'RU'
+    RX_MODE         = 'RX'
+    SPLIT_MODE      = 'SP'
+    TX_STATE        = 'TQ'
+    TX_MODE         = 'TX'
 
+    COMMANDS = [AF_GAIN, SIG_GEN_FREQ, VFO_A, VFO_B, RX_VFO_MODE, TX_VFO_MODE, FILTER_BW, RADIO_ID, RADIO_INFO, OPERATING_MODE, TXCO_FREQ, SIDEBAND, DEFAULT_FREQ, RX_GAIN, VOX_EN,
+        TX_RISE, TX_FALL, CYCLE_MIN, SAMPLE_MIN, DISCARD, IQ_MODE, JAPAN_BAND_LIM, NEG_RIT_OFFSET, RIT_STATUS, POS_RIT_OFFSET, RX_MODE, SPLIT_MODE, TX_STATE, TX_MODE]
 
-    def __init__(self, port = None, detect = True):
-        # QDX CAT commands
-        # Kenwood TS-480/TS-440 command set
-        self.AF_GAIN         = {'cmd': 'AG', 'get': self.get_af_gain,               'set': self.set_af_gain,                'label': 'Audio Gain',          'unit': '',     'map': None} 
-        self.SIG_GEN_FREQ    = {'cmd': 'C2', 'get': self.get_sig_gen_freq,          'set': self.set_sig_gen_freq,           'label': 'Signal Gen',          'unit': 'Hz',   'map': None} 
-        self.VFO_A           = {'cmd': 'FA', 'get': self.get_vfo_a,                 'set': self.set_vfo_a,                  'label': 'VFO A',               'unit': 'Hz',   'map': None} 
-        self.VFO_B           = {'cmd': 'FB', 'get': self.get_vfo_b,                 'set': self.set_vfo_b,                  'label': 'VFO B',               'unit': 'Hz',   'map': None} 
-        self.RX_VFO_MODE     = {'cmd': 'FR', 'get': self.get_rx_vfo_mode,           'set': self.set_rx_vfo_mode,            'label': 'RX VFO Mode',         'unit': '',     'map': {'0':'VFO A', '1':'VFO B', '2':'Split'}} 
-        self.TX_VFO_MODE     = {'cmd': 'FT', 'get': self.get_tx_vfo_mode,           'set': self.set_tx_vfo_mode,            'label': 'TX VFO Mode',         'unit': '',     'map': {'0':'VFO A', '1':'VFO B', '2':'Split'}} 
-        self.FILTER_BW       = {'cmd': 'FW', 'get': self.get_filter_bw,             'set': None,                            'label': 'Filter Bandwidth',    'unit': 'Hz',   'map': None} 
-        self.RADIO_ID        = {'cmd': 'ID', 'get': self.get_radio_id,              'set': None,                            'label': 'Radio ID',            'unit': '',     'map': None} 
-        self.RADIO_INFO      = {'cmd': 'IF', 'get': self.get_radio_info_dict,       'set': None,                            'label': 'Radio Info',          'unit': '',     'map': None} 
-        self.OPERATING_MODE  = {'cmd': 'MD', 'get': self.get_operating_mode,        'set': self.set_operating_mode,         'label': 'Operating Mode',      'unit': '',     'map': {'1':'LSB', '3':'USB'}} 
-        self.TXCO_FREQ       = {'cmd': 'Q0', 'get': self.get_txco_freq,             'set': self.set_txco_freq,              'label': 'TXCO',                'unit': 'Hz',   'map': None} 
-        self.SIDEBAND        = {'cmd': 'Q1', 'get': self.get_sideband,              'set': self.set_sideband,               'label': 'Sideband',            'unit': '',     'map': {'0':'USB', '1':'LSB'}} 
-        self.DEFAULT_FREQ    = {'cmd': 'Q2', 'get': self.get_default_freq,          'set': self.set_default_freq,           'label': 'Default Freq',        'unit': 'Hz',   'map': None} 
-        self.RX_GAIN         = {'cmd': 'Q3', 'get': self.get_rx_gain,               'set': self.set_rx_gain,                'label': 'RX Gain',             'unit': '',     'map': None} 
-        self.VOX_EN          = {'cmd': 'Q4', 'get': self.get_vox_enable,            'set': self.set_vox_enable,             'label': 'VOX',                 'unit': '',     'map': {'0':'Off', '1':'On'}} 
-        self.TX_RISE         = {'cmd': 'Q5', 'get': self.get_tx_rise_threshold,     'set': self.set_tx_rise_threshold,      'label': 'TX Rise',             'unit': '',     'map': None} 
-        self.TX_FALL         = {'cmd': 'Q6', 'get': self.get_tx_fall_threshold,     'set': self.set_tx_fall_threshold,      'label': 'TX Fall',             'unit': '',     'map': None} 
-        self.CYCLE_MIN       = {'cmd': 'Q7', 'get': self.get_cycle_min_parameter,   'set': self.set_cycle_min_parameter,    'label': 'Cycle Min',           'unit': '',     'map': None} 
-        self.SAMPLE_MIN      = {'cmd': 'Q8', 'get': self.get_sample_min_parameter,  'set': self.set_sample_min_parameter,   'label': 'Sample Min',          'unit': '',     'map': None} 
-        self.DISCARD         = {'cmd': 'Q9', 'get': self.get_discard_parameter,     'set': self.set_discard_parameter,      'label': 'Discard',             'unit': '',     'map': None} 
-        self.IQ_MODE         = {'cmd': 'QA', 'get': self.get_iq_mode,               'set': self.set_iq_mode,                'label': 'IQ Mode',             'unit': '',     'map': {'0':'Off', '1':'On'}} 
-        self.JAPAN_BAND_LIM  = {'cmd': 'QB', 'get': self.get_japan_band_limit_mode, 'set': self.set_japan_band_limit_mode,  'label': 'Japan Band Mode',     'unit': '',     'map': {'0':'Off', '1':'On'}} 
-        self.NEG_RIT_OFFSET  = {'cmd': 'RD', 'get': None,                           'set': self.set_negative_rit_offset,    'label': 'Neg RIT Offset',      'unit': '',     'map': None} 
-        self.RIT_STATUS      = {'cmd': 'RT', 'get': self.get_rit_status,            'set': None,                            'label': 'RIT',                 'unit': '',     'map': {'0':'Off', '1':'On'}} 
-        self.POS_RIT_OFFSET  = {'cmd': 'RU', 'get': None,                           'set': self.set_positive_rit_offset,    'label': 'Pos RIT Offset',      'unit': '',     'map': None} 
-        self.RX_MODE         = {'cmd': 'RX', 'get': None,                           'set': self.set_rx,                     'label': 'RX',                  'unit': '',     'map': None} 
-        self.SPLIT_MODE      = {'cmd': 'SP', 'get': self.get_split_mode,            'set': self.set_split_mode,             'label': 'Split Mode',          'unit': '',     'map': {'0':'Off', '1':'On'}} 
-        self.TX_STATE        = {'cmd': 'TQ', 'get': self.get_tx_state,              'set': self.set_tx_state,               'label': 'RX/TX State',         'unit': '',     'map': {'0':'RX', '1':'TX'}} 
-        self.TX_MODE         = {'cmd': 'TX', 'get': None,                           'set': self.set_tx,                     'label': 'TX',                  'unit': '',     'map': None} 
-
-        self.commands = [self.VFO_A, self.VFO_B, self.RX_VFO_MODE, self.TX_VFO_MODE,self.FILTER_BW, self.RADIO_ID, self.RADIO_INFO, self.OPERATING_MODE, self.TXCO_FREQ, self.SIDEBAND,
-                self.DEFAULT_FREQ, self.RX_GAIN, self.VOX_EN, self.TX_RISE, self.TX_FALL, self.CYCLE_MIN,self.SAMPLE_MIN, self.DISCARD, self.IQ_MODE, self.JAPAN_BAND_LIM,
-                self.NEG_RIT_OFFSET,self.RIT_STATUS, self.POS_RIT_OFFSET, self.RX_MODE, self.SPLIT_MODE, self.TX_STATE, self.TX_MODE, self.AF_GAIN, self.SIG_GEN_FREQ]
+    def __init__(self, port = None, detect = True):        
+        self.command_map = {
+            'AG' : {'get': self.get_af_gain,               'set': self.set_af_gain,                'label': 'Audio Gain',          'unit': '',     'options': None}, 
+            'C2' : {'get': self.get_sig_gen_freq,          'set': self.set_sig_gen_freq,           'label': 'Signal Gen',          'unit': 'Hz',   'options': None}, 
+            'FA' : {'get': self.get_vfo_a,                 'set': self.set_vfo_a,                  'label': 'VFO A',               'unit': 'Hz',   'options': None}, 
+            'FB' : {'get': self.get_vfo_b,                 'set': self.set_vfo_b,                  'label': 'VFO B',               'unit': 'Hz',   'options': None}, 
+            'FR' : {'get': self.get_rx_vfo_mode,           'set': self.set_rx_vfo_mode,            'label': 'RX VFO Mode',         'unit': '',     'options': {'0':'VFO A', '1':'VFO B', '2':'Split'}}, 
+            'FT' : {'get': self.get_tx_vfo_mode,           'set': self.set_tx_vfo_mode,            'label': 'TX VFO Mode',         'unit': '',     'options': {'0':'VFO A', '1':'VFO B', '2':'Split'}}, 
+            'FW' : {'get': self.get_filter_bw,             'set': None,                            'label': 'Filter Bandwidth',    'unit': 'Hz',   'options': None}, 
+            'ID' : {'get': self.get_radio_id,              'set': None,                            'label': 'Radio ID',            'unit': '',     'options': None}, 
+            'IF' : {'get': self.get_radio_info_dict,       'set': None,                            'label': 'Radio Info',          'unit': '',     'options': None}, 
+            'MD' : {'get': self.get_operating_mode,        'set': self.set_operating_mode,         'label': 'Operating Mode',      'unit': '',     'options': {'1':'LSB', '3':'USB'}}, 
+            'Q0' : {'get': self.get_txco_freq,             'set': self.set_txco_freq,              'label': 'TXCO',                'unit': 'Hz',   'options': None}, 
+            'Q1' : {'get': self.get_sideband,              'set': self.set_sideband,               'label': 'Sideband',            'unit': '',     'options': {'0':'USB', '1':'LSB'}}, 
+            'Q2' : {'get': self.get_default_freq,          'set': self.set_default_freq,           'label': 'Default Freq',        'unit': 'Hz',   'options': None}, 
+            'Q3' : {'get': self.get_rx_gain,               'set': self.set_rx_gain,                'label': 'RX Gain',             'unit': '',     'options': None}, 
+            'Q4' : {'get': self.get_vox_enable,            'set': self.set_vox_enable,             'label': 'VOX',                 'unit': '',     'options': {'0':'Off', '1':'On'}}, 
+            'Q5' : {'get': self.get_tx_rise_threshold,     'set': self.set_tx_rise_threshold,      'label': 'TX Rise',             'unit': '',     'options': None}, 
+            'Q6' : {'get': self.get_tx_fall_threshold,     'set': self.set_tx_fall_threshold,      'label': 'TX Fall',             'unit': '',     'options': None}, 
+            'Q7' : {'get': self.get_cycle_min_parameter,   'set': self.set_cycle_min_parameter,    'label': 'Cycle Min',           'unit': '',     'options': None}, 
+            'Q8' : {'get': self.get_sample_min_parameter,  'set': self.set_sample_min_parameter,   'label': 'Sample Min',          'unit': '',     'options': None}, 
+            'Q9' : {'get': self.get_discard_parameter,     'set': self.set_discard_parameter,      'label': 'Discard',             'unit': '',     'options': None}, 
+            'QA' : {'get': self.get_iq_mode,               'set': self.set_iq_mode,                'label': 'IQ Mode',             'unit': '',     'options': {'0':'Off', '1':'On'}}, 
+            'QB' : {'get': self.get_japan_band_limit_mode, 'set': self.set_japan_band_limit_mode,  'label': 'Japan Band Mode',     'unit': '',     'options': {'0':'Off', '1':'On'}}, 
+            'RD' : {'get': None,                           'set': self.set_negative_rit_offset,    'label': 'Neg RIT Offset',      'unit': '',     'options': None}, 
+            'RT' : {'get': self.get_rit_status,            'set': None,                            'label': 'RIT',                 'unit': '',     'options': {'0':'Off', '1':'On'}}, 
+            'RU' : {'get': None,                           'set': self.set_positive_rit_offset,    'label': 'Pos RIT Offset',      'unit': '',     'options': None}, 
+            'RX' : {'get': None,                           'set': self.set_rx,                     'label': 'RX',                  'unit': '',     'options': None}, 
+            'SP' : {'get': self.get_split_mode,            'set': self.set_split_mode,             'label': 'Split Mode',          'unit': '',     'options': {'0':'Off', '1':'On'}}, 
+            'TQ' : {'get': self.get_tx_state,              'set': self.set_tx_state,               'label': 'RX/TX State',         'unit': '',     'options': {'0':'RX', '1':'TX'}}, 
+            'TX' : {'get': None,                           'set': self.set_tx,                     'label': 'TX',                  'unit': '',     'options': None}
+        }
 
         # serial port config
         self.port = port
@@ -48,14 +77,16 @@ class QDX:
 
         self.settings = {}
 
-        if self.port == None and detect == True:
+        if self.port is not None:
+            self.update_local_settings()
+        elif detect == True:
             self.detect()
 
     def detect(self):
         self.port = None
         if not os.path.isdir('/dev/serial/by-id'):
-            raise Exception('QDX device not found, try specifying a serial port')
-            return None
+            raise OSError('QDX device not found, try specifying a serial port')
+            return
 
         qdx_devices = []
         with os.scandir('/dev/serial/by-id/') as devices:
@@ -72,45 +103,94 @@ class QDX:
         if len(qdx_devices) == 1:
             self.set_port(qdx_devices[0])
         elif len(qdx_devices) > 1:
-            raise Exception('Multiple QDX devices found, try specifying a serial port')
+            raise OSError('Multiple QDX devices found, try specifying a serial port')
         else:
-            raise Exception('QDX device not found, try specifiying a serial port')
-
-        return None
+            raise OSError('QDX device not found, check device connection or specifiy a serial port')
 
     def set_port(self, port):
-        if port != None:
-            self.port = str(port)
-            self.update_settings()
+        if port is None:
+            return
+            
+        self.port = str(port)
+        self.update_local_settings()
 
-    def command(self, cat_cmd, value = None):
-        for cmd in self.commands:
-            if cmd['cmd'] == cat_cmd:
-                if value == None and cmd['get'] != None:
-                    return cmd['get']()
-                elif cmd['set'] != None:
-                    cmd['set'](value)
-                    if cmd['cmd'] in self.settings.keys() and cmd['get'] != None:
-                        self.settings[cmd['cmd']]['value'] = cmd['get']()
-                    return None
+    def get(self, cmd):
+        if cmd not in QDX.COMMANDS:
+            raise ValueError('Invalid QDX command: {}'.format(cmd))
 
-    def update_settings(self):
+        if cmd in self.settings:
+            return self.settings[cmd]['value']
+        else:
+            return self.command(cmd)
+
+    def set(self, cmd, value):
+        if cmd not in QDX.COMMANDS:
+            raise ValueError('Invalid QDX command: {}'.format(cmd))
+
+        self.command(cmd, value)
+
+    def command(self, cmd, value = None):
+        if cmd not in QDX.COMMANDS:
+            raise ValueError('Invalid QDX command: {}'.format(cmd))
+            
+        if value is None and self.command_map[cmd]['get'] is not None:
+            # get command value
+            return self.command_map[cmd]['get']()
+            
+        elif self.command_map[cmd]['set'] is not None:
+            # set command value
+            self.command_map[cmd]['set'](value)
+
+            # update local settings
+            if cmd in self.settings and self.command_map[cmd]['get'] is not None:
+                self.settings[cmd]['value'] = self.command_map[cmd]['get']()
+
+    def update_local_settings(self):
         # TODO these commands do not appear to work correctly at the moment, 02/19/2022
         ignore_cmd = ['IF', 'ID', 'AG', 'Q0', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'QA', 'QB', 'RT']
-        if self.port != None:
-            for cmd in self.commands:
-                if cmd['get'] != None and cmd['cmd'] not in ignore_cmd:
-                    try:
-                        self.settings[cmd['cmd']] = {'value': cmd['get'](), 'label': cmd['label'], 'unit': cmd['unit'], 'map': cmd['map']}
-                    except Exception as e:
-                        print(cmd['cmd'] + ': ' + str(e))
+        
+        if self.port is None:
+            return
+            
+        for cmd in QDX.COMMANDS:
+            #TODO remove conditional statement
+            if cmd not in ignore_cmd:
+                self.update_setting(cmd)
 
-    def __serial_request(self, cmd, value = None):
+    def update_local_setting(self, cmd):
+        if cmd not in QDX.COMMANDS:
+            raise ValueError('Invalid QDX command: {}'.format(cmd))
+            
+        if self.command_map[cmd]['get'] is not None:
+            try:
+                self.settings[cmd] = {
+                    'value': self.command_map[cmd]['get'](),
+                    'label': self.command_map[cmd]['label'],
+                    'unit': self.command_map[cmd]['unit'],
+                    'options': self.command_map[cmd]['options']
+                }
+            except Exception as e:
+                print('{}: {}'.format(cmd, str(e))
+
+    def ptt_on(self):
+        self.command(QDX.TX_STATE, 1)
+                          
+    def ptt_off(self):
+        self.command(QDX.TX_STATE, 0)
+        
+    def toggle_ptt(self):
+        if self.command(QDX.TX_STATE) == 0:
+            self.ptt_on()
+        else:
+            self.ptt_off()
+    
+    def _serial_request(self, cmd, value = None):
         # build command string
         if value != None:
             request = str(cmd) + str(value) + ';'
         else:
             request = str(cmd) + ';'
+            
         # encode command string to bytes
         request = request.encode('utf-8')
 
@@ -126,28 +206,30 @@ class QDX:
                         response = serial_port.read_until(expected=b';')
                     else:
                         response = serial_port.read_until(terminator=b';')
+                        
         except Exception as e:
-            raise Exception('Error with serial port ' + self.port + ', check device connection')
+            raise OSError('Error on serial port {}, check device connection'.format(self.port))
         
         # decode bytes to response string
         response = response.decode('utf-8')
-
         # remove empty byte at the end of some returned values
         response = response.replace('\x00', '')
+        
         # stop processing if the device did not understand the command
         if response == '?;':
             return None
+            
         # remove leading command string and trailing semicolon
         response = response[2:-1]
 
         return response
     
-    # TODO check if some command reaponses should be float instead of int, error could be :
-    # 'invalid literal for int() with base 10'
+        # TODO check if some command reaponses should be float instead of int, error may be:
+        # 'invalid literal for int() with base 10'
 
     # TODO CAT command not working
     def get_af_gain(self):
-        gain = self.__serial_request(self.AF_GAIN['cmd'])
+        gain = self._serial_request(QDX.AF_GAIN)
         if gain != None:
             gain = int(gain)
         return gain
@@ -155,77 +237,77 @@ class QDX:
     # TODO CAT command not working
     def set_af_gain(self, value):
         value = int(value)
-        self.__serial_request(self.AF_GAIN['cmd'], value)
+        self._serial_request(QDX.AF_GAIN, value)
 
     def get_sig_gen_freq(self):
-        freq = self.__serial_request(self.SIG_GEN_FREQ['cmd'])
+        freq = self._serial_request(QDX.SIG_GEN_FREQ)
         if freq != None:
             freq = int(freq)
         return freq
 
     def set_sig_gen_freq(self, value):
         value = int(value)
-        self.__serial_request(self.SIG_GEN_FREQ['cmd'], value)
+        self._serial_request(QDX.SIG_GEN_FREQ, value)
 
     def get_vfo_a(self):
-        freq = self.__serial_request(self.VFO_A['cmd'])
+        freq = self._serial_request(QDX.VFO_A)
         if freq != None:
             freq = int(freq)
         return freq
 
     def set_vfo_a(self, value):
         value = int(value)
-        self.__serial_request(self.VFO_A['cmd'], value)
+        self._serial_request(QDX.VFO_A, value)
 
     def get_vfo_b(self):
-        freq = self.__serial_request(self.VFO_B['cmd'])
+        freq = self._serial_request(QDX.VFO_B)
         if freq != None:
             freq = int(freq)
         return freq
 
     def set_vfo_b(self, value):
         value = int(value)
-        self.__serial_request(self.VFO_B['cmd'], value)
+        self._serial_request(QDX.VFO_B, value)
 
     def get_rx_vfo_mode(self):
-        mode = self.__serial_request(self.RX_VFO_MODE['cmd'])
+        mode = self._serial_request(QDX.RX_VFO_MODE)
         if mode != None:
             mode = int(mode)
         return mode
 
     def set_rx_vfo_mode(self, value):
         value = int(value)
-        self.__serial_request(self.RX_VFO_MODE['cmd'], value)
+        self._serial_request(QDX.RX_VFO_MODE, value)
     
     def get_tx_vfo_mode(self):
-        mode = self.__serial_request(self.TX_VFO_MODE['cmd'])
+        mode = self._serial_request(QDX.TX_VFO_MODE)
         if mode != None:
             mode = int(mode)
         return mode
 
     def set_tx_vfo_mode(self, value):
         value = int(value)
-        self.__serial_request(self.TX_VFO_MODE['cmd'], value)
+        self._serial_request(QDX.TX_VFO_MODE, value)
         
     def get_filter_bw(self):
-        bw = self.__serial_request(self.FILTER_BW['cmd'])
+        bw = self._serial_request(QDX.FILTER_BW)
         if bw != None:
             bw = int(bw)
         return bw
 
     def get_radio_id(self):
-        radio_id = self.__serial_request(self.RADIO_ID['cmd'])
+        radio_id = self._serial_request(QDX.RADIO_ID)
         if radio_id != None:
             radio_id = int(radio_id)
         return radio_id
 
     def get_radio_info(self):
-        info = self.__serial_request(self.RADIO_INFO['cmd'])
+        info = self._serial_request(QDX.RADIO_INFO)
         return info
 
     def get_radio_info_dict(self):
         info_dict = {}
-        info = self.__serial_request(self.RADIO_INFO['cmd'])
+        info = self._serial_request(QDX.RADIO_INFO)
 
         if info == None:
             return None
@@ -250,173 +332,171 @@ class QDX:
         return info_dict
 
     def get_operating_mode(self):
-        mode = self.__serial_request(self.OPERATING_MODE['cmd'])
+        mode = self._serial_request(QDX.OPERATING_MODE)
         if mode != None:
             mode = int(mode)
         return mode
 
     def set_operating_mode(self, value):
         value = int(value)
-        self.__serial_request(self.OPERATING_MODE['cmd'], value)
+        self._serial_request(QDX.OPERATING_MODE, value)
 
     def get_txco_freq(self):
-        freq = self.__serial_request(self.TXCO_FREQ['cmd'])
+        freq = self._serial_request(QDX.TXCO_FREQ)
         if freq != None:
             freq = int(freq)
         return freq
 
     def set_txco_freq(self, value):
         value = int(value)
-        self.__serial_request(self.TXCO_FREQ['cmd'], value)
+        self._serial_request(QDX.TXCO_FREQ, value)
 
     def get_sideband(self):
-        sideband = self.__serial_request(self.SIDEBAND['cmd'])
+        sideband = self._serial_request(QDX.SIDEBAND)
         if sideband != None:
             sideband = int(sideband)
         return sideband
 
     def set_sideband(self, value):
         value = int(value)
-        self.__serial_request(self.SIDEBAND['cmd'], value)
+        self._serial_request(QDX.SIDEBAND, value)
 
     def get_default_freq(self):
-        freq = self.__serial_request(self.DEFAULT_FREQ['cmd'])
+        freq = self._serial_request(QDX.DEFAULT_FREQ)
         if freq != None:
             freq = int(freq)
         return freq
 
     def set_default_freq(self, value):
         value = int(value)
-        self.__serial_request(self.DEFAULT_FREQ['cmd'], value)
+        self._serial_request(QDX.DEFAULT_FREQ, value)
 
     def get_rx_gain(self):
-        gain = self.__serial_request(self.RX_GAIN['cmd'])
+        gain = self._serial_request(QDX.RX_GAIN)
         if gain != None:
             gain = int(gain)
         return gain
 
     def set_rx_gain(self, value):
         value = int(value)
-        self.__serial_request(self.RX_GAIN['cmd'], value)
+        self._serial_request(QDX.RX_GAIN, value)
 
     def get_vox_enable(self):
-        vox = self.__serial_request(self.VOX_EN['cmd'])
+        vox = self._serial_request(QDX.VOX_EN)
         if vox != None:
             vox = int(vox)
         return vox
 
     def set_vox_enable(self, value):
         value = int(value)
-        self.__serial_request(self.VOX_EN['cmd'], value)
+        self._serial_request(QDX.VOX_EN, value)
 
     def get_tx_rise_threshold(self):
-        threshold = self.__serial_request(self.TX_RISE['cmd'])
+        threshold = self._serial_request(QDX.TX_RISE)
         if threshold != None:
             threshold = int(threshold)
         return threshold
 
     def set_tx_rise_threshold(self, value):
         value = int(value)
-        self.__serial_request(self.TX_RISE['cmd'], value)
+        self._serial_request(QDX.TX_RISE, value)
 
     def get_tx_fall_threshold(self):
-        threshold = self.__serial_request(self.TX_FALL['cmd'])
+        threshold = self._serial_request(QDX.TX_FALL)
         if threshold != None:
             threshold = int(threshold)
         return threshold
 
     def set_tx_fall_threshold(self, value):
         value = int(value)
-        self.__serial_request(self.TX_FALL['cmd'], value)
+        self._serial_request(QDX.TX_FALL, value)
 
     def get_cycle_min_parameter(self):
-        parameter = self.__serial_request(self.CYCLE_MIN['cmd'])
+        parameter = self._serial_request(QDX.CYCLE_MIN)
         if parameter != None:
             parameter = int(parameter)
         return parameter
 
     def set_cycle_min_parameter(self, value):
         value = int(value)
-        self.__serial_request(self.CYCLE_MIN['cmd'], value)
+        self._serial_request(QDX.CYCLE_MIN, value)
 
     def get_sample_min_parameter(self):
-        parameter = self.__serial_request(self.SAMPLE_MIN['cmd'])
+        parameter = self._serial_request(QDX.SAMPLE_MIN)
         if parameter != None:
             parameter = int(parameter)
         return parameter
 
     def set_sample_min_parameter(self, value):
         value = int(value)
-        self.__serial_request(self.SAMPLE_MIN['cmd'], value)
+        self._serial_request(QDX.SAMPLE_MIN, value)
 
     def get_discard_parameter(self):
-        parameter = self.__serial_request(self.DISCARD['cmd'])
+        parameter = self._serial_request(QDX.DISCARD)
         if parameter != None:
             parameter = int(parameter)
         return parameter
 
     def set_discard_parameter(self, value):
         value = int(value)
-        self.__serial_request(self.DISCARD['cmd'], value)
+        self._serial_request(QDX.DISCARD, value)
 
     def get_iq_mode(self):
-        mode = self.__serial_request(self.IQ_MODE['cmd'])
+        mode = self._serial_request(QDX.IQ_MODE)
         if mode != None:
             mode = int(mode)
         return mode
 
     def set_iq_mode(self, value):
         value = int(value)
-        self.__serial_request(self.IQ_MODE['cmd'], value)
+        self._serial_request(QDX.IQ_MODE, value)
 
     def get_japan_band_limit_mode(self):
-        mode = self.__serial_request(self.JAPAN_BAND_LIM['cmd'])
+        mode = self._serial_request(QDX.JAPAN_BAND_LIM)
         if mode != None:
             mode = int(mode)
         return mode
 
     def set_japan_band_limit_mode(self, value):
         value = int(value)
-        self.__serial_request(self.JAPAN_BAND_LIM['cmd'], value)
+        self._serial_request(QDX.JAPAN_BAND_LIM, value)
 
     def set_negative_rit_offset(self, value):
         value = int(value)
-        self.__serial_request(self.NEG_RIT_OFFSET['cmd'], value)
+        self._serial_request(QDX.NEG_RIT_OFFSET, value)
 
     def get_rit_status(self):
-        status = self.__serial_request(self.RIT_STATUS['cmd'])
+        status = self._serial_request(QDX.RIT_STATUS)
         if status != None:
             status = int(status)
         return status
     
     def set_positive_rit_offset(self, value):
         value = int(value)
-        self.__serial_request(self.POS_RIT_OFFSET['cmd'], value)
+        self._serial_request(QDX.POS_RIT_OFFSET, value)
 
     def set_rx(self, value):
-        self.__serial_request(self.RX_MODE['cmd'])
+        self._serial_request(QDX.RX_MODE)
 
     def get_split_mode(self):
-        mode = self.__serial_request(self.SPLIT_MODE['cmd'])
+        mode = self._serial_request(QDX.SPLIT_MODE)
         if mode != None:
             mode = int(mode)
         return mode
 
     def set_split_mode(self, value):
         value = int(value)
-        self.__serial_request(self.SPLIT_MODE['cmd'], value)
+        self._serial_request(QDX.SPLIT_MODE, value)
 
     def get_tx_state(self):
-        state = self.__serial_request(self.TX_STATE['cmd'])
+        state = self._serial_request(QDX.TX_STATE)
         if state != None:
             state = int(state)
         return state
 
     def set_tx_state(self, value):
         value = int(value)
-        self.__serial_request(self.TX_STATE['cmd'], value)
+        self._serial_request(QDX.TX_STATE, value)
 
     def set_tx(self, value):
-        self.__serial_request(self.TX_MODE['cmd'])
-
-
+        self._serial_request(QDX.TX_MODE)
