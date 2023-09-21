@@ -143,7 +143,7 @@ class QDX:
                 self.settings[cmd] = self.command_map[cmd]['get']()
             except Exception as e:
                 print('{}: {}'.format(cmd, str(e))
-
+    
     def sync_local_settings(self):
         # TODO these commands do not appear to work correctly at the moment, 02/19/2022
         ignore_cmd = ['IF', 'ID', 'AG', 'Q0', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'QA', 'QB', 'RT']
