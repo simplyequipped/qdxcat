@@ -142,7 +142,7 @@ class QDX:
             try:
                 self.settings[cmd] = self.command_map[cmd]['get']()
             except Exception as e:
-                print('{}: {}'.format(cmd, str(e))
+                raise ValueError('Error processing command: {}'.format(cmd)) from e
     
     def sync_local_settings(self):
         # TODO these commands do not appear to work correctly at the moment, 02/19/2022
