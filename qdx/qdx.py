@@ -70,20 +70,21 @@ class QDX:
             'TX' : {'get': None,                           'set': self.set_tx,                     'label': 'TX',                  'unit': '',     'options': None}
         }
 
+        self.settings = {}
+        
         # serial port config
-        self.port = port
+        self.port = None
         self.baudrate = 9600
         self.timeout = 1
 
-        self.settings = {}
-
-        if self.port is not None:
-            self.update_local_settings()
+        if port is not None:
+            self.set_port(port)
         elif detect == True:
             self.detect()
 
     def detect(self):
         self.port = None
+        
         if not os.path.isdir('/dev/serial/by-id'):
             raise OSError('QDX device not found, try specifying a serial port')
             return
@@ -112,81 +113,64 @@ class QDX:
             return
             
         self.port = str(port)
-        self.update_local_settings()
+        self.sync_local_settings()
 
-    def get(self, cmd):
+    def get(self, cmd, update=False):
         if cmd not in QDX.COMMANDS:
             raise ValueError('Invalid QDX command: {}'.format(cmd))
-
-        if cmd in self.settings:
-            return self.settings[cmd]['value']
-        else:
-            return self.command(cmd)
+            
+        if update or cmd not in self.settings:
+            self.sync_local_setting(cmd)
+        
+        return self.setting[cmd]
 
     def set(self, cmd, value):
         if cmd not in QDX.COMMANDS:
             raise ValueError('Invalid QDX command: {}'.format(cmd))
-
-        self.command(cmd, value)
-
-    def command(self, cmd, value = None):
-        if cmd not in QDX.COMMANDS:
-            raise ValueError('Invalid QDX command: {}'.format(cmd))
             
-        if value is None and self.command_map[cmd]['get'] is not None:
-            # get command value
-            return self.command_map[cmd]['get']()
-            
-        elif self.command_map[cmd]['set'] is not None:
+        if self.command_map[cmd]['set'] is not None:
             # set command value
             self.command_map[cmd]['set'](value)
 
-            # update local settings
-            if cmd in self.settings and self.command_map[cmd]['get'] is not None:
-                self.settings[cmd]['value'] = self.command_map[cmd]['get']()
+        return self.get(cmd, update=True)
 
-    def update_local_settings(self):
-        # TODO these commands do not appear to work correctly at the moment, 02/19/2022
-        ignore_cmd = ['IF', 'ID', 'AG', 'Q0', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'QA', 'QB', 'RT']
-        
-        if self.port is None:
-            return
-            
-        for cmd in QDX.COMMANDS:
-            #TODO remove conditional statement
-            if cmd not in ignore_cmd:
-                self.update_setting(cmd)
-
-    def update_local_setting(self, cmd):
+    def sync_local_setting(self, cmd):
         if cmd not in QDX.COMMANDS:
             raise ValueError('Invalid QDX command: {}'.format(cmd))
             
         if self.command_map[cmd]['get'] is not None:
             try:
-                self.settings[cmd] = {
-                    'value': self.command_map[cmd]['get'](),
-                    'label': self.command_map[cmd]['label'],
-                    'unit': self.command_map[cmd]['unit'],
-                    'options': self.command_map[cmd]['options']
-                }
+                self.settings[cmd] = self.command_map[cmd]['get']()
             except Exception as e:
                 print('{}: {}'.format(cmd, str(e))
 
+    def sync_local_settings(self):
+        # TODO these commands do not appear to work correctly at the moment, 02/19/2022
+        ignore_cmd = ['IF', 'ID', 'AG', 'Q0', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'QA', 'QB', 'RT']
+            
+        for cmd in QDX.COMMANDS:
+            #TODO remove conditional statement
+            if cmd not in ignore_cmd:
+                self.sync_local_setting(cmd)
+
     def ptt_on(self):
-        self.command(QDX.TX_STATE, 1)
+        self.set(QDX.TX_STATE, 1)
                           
     def ptt_off(self):
-        self.command(QDX.TX_STATE, 0)
+        self.set(QDX.TX_STATE, 0)
         
     def toggle_ptt(self):
-        if self.command(QDX.TX_STATE) == 0:
+        if self.get(QDX.TX_STATE) == 0:
             self.ptt_on()
         else:
             self.ptt_off()
     
     def _serial_request(self, cmd, value = None):
+        if self.port is None:
+            raise ValueError('Serial port not set')
+            
         # build command string
-        if value != None:
+        if value is not None:
             request = str(cmd) + str(value) + ';'
         else:
             request = str(cmd) + ';'
