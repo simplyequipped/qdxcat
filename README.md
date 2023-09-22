@@ -1,38 +1,38 @@
-# qdx
+# qdxcat
 
 A Python 3 package for working with the [QDX tranceiver from QRP Labs](http://qrp-labs.com/qdx).
 
-The default is to auto detect the QDX device when using a Linux system (tested on Ubuntu 20.04 and Raspberry Pi OS buster). If the QDX cannot be detected you can specify a serial port by passing the serial port to the qdx.QDX() constructor. Auto detect can be disabled by passing the appropraite information to the qdx.QDX() constructor, and setting the serial port or auto detecting later.
+The QDX serial port is auto-detected (tested on Ubuntu 20.04 and Raspberry Pi OS buster) by default, or it can be manually specified.
 
-Auto detect:
+Auto-detect the serial port:
 ```
-import qdx
-radio = qdx.QDX()
+import qdxcat
+qdx = qdxcat.QDX()
 ```
 
 Specify a serial port:
 ```
-import qdx
-radio = qdx.QDX(port = '/dev/ttyUSB0')
+import qdxcat
+qdx = qdxcat.QDX(port = '/dev/ttyUSB0')
 ```
 
 Disable auto detect, specify a serial port later:
 ```
-import qdx
-radio = qdx.QDX(detect = False)
-radio.set_port('/dev/ttyUSB0')
+import qdxcat
+qdx = qdxcat.QDX(detect = False)
+qdx.set_port('/dev/ttyUSB0')
 ```
 
 Perform auto detect later:
 ```
-import qdx
-radio = qdx.QDX(detect = False)
-radio.detect()
+import qdxcat
+qdx = qdxcat.QDX(detect = False)
+qdx.detect()
 ```
 
 ### CAT Commands
 
-The package includes get and set functions for all documented CAT commands (some commands seem not to be working with firmware v1.03). Check out the example.py file included in the repo for an example of working with the CAT functions as well as the QDX.command() utility function.
+The package includes get and set functions for all documented CAT commands (some commands seem not to be working with firmware v1.03). Check out the example.py file in the repo.
 
 ### Install
 
