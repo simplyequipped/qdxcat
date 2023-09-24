@@ -85,7 +85,8 @@ class QDX:
             self.autodetect()
 
     def autodetect(self):
-        ports = serial.tools.list_ports.grep('QDX Transceiver')
+        # force generator to list
+        ports = list( serial.tools.list_ports.grep('QDX Transceiver') )
 
         if len(ports) == 1:
             self.set_port(ports[0].device)
@@ -109,7 +110,7 @@ class QDX:
         if update or cmd not in self.settings:
             self.sync_local_setting(cmd)
         
-        return self.setting[cmd]
+        return self.settings[cmd]
 
     def set(self, cmd, value):
         if cmd not in QDX.COMMANDS:
