@@ -1,55 +1,78 @@
 # qdxcat
 
-A Python 3 package for working with the [QDX tranceiver from QRP Labs](http://qrp-labs.com/qdx).
+Implements CAT control for the  [QRPLabs QDX transceiver](http://qrp-labs.com/qdx).
 
-The QDX serial port is auto-detected (tested on Ubuntu 20.04 and Raspberry Pi OS buster) by default, or it can be manually specified.
+Serial port interfacing is cross-platform by the use of the pySerial package. The QDX serial port is auto-detected by default.
 
-Auto-detect the serial port:
+### Examples
+
+Auto-detect serial port (default):
 ```
 import qdxcat
 qdx = qdxcat.QDX()
 ```
 
-Specify a serial port:
+Specify serial port:
 ```
 import qdxcat
-qdx = qdxcat.QDX(port = '/dev/ttyUSB0')
+qdx = qdxcat.QDX('/dev/ttyXXX')
 ```
 
-Disable auto detect, specify a serial port later:
+Disable auto-detect, specify serial port later:
 ```
 import qdxcat
-qdx = qdxcat.QDX(detect = False)
-qdx.set_port('/dev/ttyUSB0')
+qdx = qdxcat.QDX(autodetect = False)
+qdx.set_port('/dev/ttyXXX')
 ```
 
-Perform auto detect later:
+Perform auto-detect later:
 ```
 import qdxcat
-qdx = qdxcat.QDX(detect = False)
-qdx.detect()
+qdx = qdxcat.QDX(autodetect = False)
+qdx.autodetect()
 ```
 
-### CAT Commands
+Get and set frequency:
+```
+import qdxcat
+qdx = qdxcat.QDX()
 
-The package includes get and set functions for all documented CAT commands (some commands seem not to be working with firmware v1.03). Check out the example.py file in the repo.
+qdx.get(qdx.VFO_A)
+qdx.set(qdx.VFO_A, 7078000)
+```
+
+Manage PTT:
+```
+import qdxcat
+qdx = qdxcat.QDX()
+
+# turn ptt on and off manually
+qdx.ptt_on()
+qdx.ptt_off()
+
+# toggle ptt state
+qdx.toggle_ptt()
+# transmit something here
+qdx.toggle_ptt()
+```
+
+See `qdxcat.QDX.COMMANDS` for a full list of supported commands.
 
 ### Install
 
-Package installation is handled by the setup script. In addition to the typical Python install, the setup script can also add the user to the 'dialout' group to enable serial port access without using sudo. Configuration of the 'dialout' group is optional and is handled by prompting the user during setup.
-
-Clone this repo and install the package:
+Install the *qdxcat* package and dependencies using *pip*:
 ```
-git clone https://github.com/simplyequipped/qdx
-cd qdx
-python3 setup.py install
+pip3 install qdxcat
 ```
 
-The only dependency is the Python serial package which can be installed manually if needed:
+**Note:** Linux operating systems may require that a user be added to the *dialout* group to access serial ports without *sudo*. Check if the current user is a member of the *dialout* group using the `groups` terminal command. If *dialout* is not listed, add a user to the group using the following terminal command:
+
 ```
-pip3 install pyserial
+sudo usermod -a -G dialout *user*
 ```
 
-### Software Alpha State
+A restart may be required for group changes to take effect.
 
-**This software is still under development and should be considered an alpha release. Significant changes are likely.**
+### Software Beta State
+
+**This software is still under development and should be considered a beta release.**
