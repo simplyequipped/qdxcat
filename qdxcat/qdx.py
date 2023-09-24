@@ -133,13 +133,8 @@ class QDX:
                 raise ValueError('Error processing command: {}'.format(cmd)) from e
     
     def sync_local_settings(self):
-        # TODO these commands do not appear to work correctly at the moment, 02/19/2022
-        ignore_cmd = ['IF', 'ID', 'AG', 'Q0', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'QA', 'QB', 'RT']
-            
         for cmd in QDX.COMMANDS:
-            #TODO remove conditional statement
-            if cmd not in ignore_cmd:
-                self.sync_local_setting(cmd)
+            self.sync_local_setting(cmd)
 
     def ptt_on(self):
         self.set(QDX.TX_STATE, 1)
