@@ -1,5 +1,7 @@
-import os, sys, time
+import time
 import serial
+import threading
+
 from serial.tools.list_ports import grep
 
 
@@ -73,6 +75,7 @@ class QDX:
         }
 
         self.settings = {}
+        self._settings_lock = threading.Lock()
         
         # serial port config
         self.port = None
@@ -96,12 +99,16 @@ class QDX:
         else:
             raise IOError('QDX device not found, check device connection or specifiy a serial port')
 
-    def set_port(self, port):
+    def set_port(self, port, sync=True):
         if port is None:
             return
             
         self.port = port
-        self.sync_local_settings()
+
+        if sync:
+            thread = threading.Thread(target=self.sync_local_settings)
+            thread.daemon = True
+            thread.start()
 
     def get(self, cmd, update=False):
         if cmd not in QDX.COMMANDS:
@@ -123,14 +130,15 @@ class QDX:
         return self.get(cmd, update=True)
 
     def sync_local_setting(self, cmd):
-        if cmd not in QDX.COMMANDS:
-            raise ValueError('Invalid QDX command: {}'.format(cmd))
+        with self._settings_lock:
+            if cmd not in QDX.COMMANDS:
+                raise ValueError('Invalid QDX command: {}'.format(cmd))
             
-        if self.command_map[cmd]['get'] is not None:
-            try:
-                self.settings[cmd] = self.command_map[cmd]['get']()
-            except Exception as e:
-                raise ValueError('Error processing command: {}'.format(cmd)) from e
+            if self.command_map[cmd]['get'] is not None:
+                try:
+                    self.settings[cmd] = self.command_map[cmd]['get']()
+                except Exception as e:
+                    raise ValueError('Error processing command: {}'.format(cmd)) from e
     
     def sync_local_settings(self):
         for cmd in QDX.COMMANDS:
