@@ -1,5 +1,7 @@
 import os, sys, time
 import serial
+from serial.tools.list_ports import grep
+
 
 class QDX:
     # QDX CAT commands
@@ -37,7 +39,7 @@ class QDX:
     COMMANDS = [AF_GAIN, SIG_GEN_FREQ, VFO_A, VFO_B, RX_VFO_MODE, TX_VFO_MODE, FILTER_BW, RADIO_ID, RADIO_INFO, OPERATING_MODE, TXCO_FREQ, SIDEBAND, DEFAULT_FREQ, RX_GAIN, VOX_EN,
         TX_RISE, TX_FALL, CYCLE_MIN, SAMPLE_MIN, DISCARD, IQ_MODE, JAPAN_BAND_LIM, NEG_RIT_OFFSET, RIT_STATUS, POS_RIT_OFFSET, RX_MODE, SPLIT_MODE, TX_STATE, TX_MODE]
 
-    def __init__(self, port = None, detect = True):        
+    def __init__(self, port=None, autodetect=True):        
         self.command_map = {
             'AG' : {'get': self.get_af_gain,               'set': self.set_af_gain,                'label': 'Audio Gain',          'unit': '',     'options': None}, 
             'C2' : {'get': self.get_sig_gen_freq,          'set': self.set_sig_gen_freq,           'label': 'Signal Gen',          'unit': 'Hz',   'options': None}, 
@@ -79,40 +81,25 @@ class QDX:
 
         if port is not None:
             self.set_port(port)
-        elif detect == True:
-            self.detect()
+        elif autodetect == True:
+            self.autodetect()
 
-    def detect(self):
-        self.port = None
-        
-        if not os.path.isdir('/dev/serial/by-id'):
-            raise OSError('QDX device not found, try specifying a serial port')
-            return
+    def autodetect(self):
+        ports = serial.tools.list_ports.grep('QDX Transceiver')
 
-        qdx_devices = []
-        with os.scandir('/dev/serial/by-id/') as devices:
-            for device in devices:
-                if 'QDX' in device.name and device.is_symlink():
-                    symlink_path = os.readlink(device.path)
-                    if '../' in symlink_path:
-                        dev = os.path.abspath('/dev/serial/by-id/' + symlink_path)
-                    else:
-                        dev = symlink_path
-
-                    qdx_devices.append(dev)
-
-        if len(qdx_devices) == 1:
-            self.set_port(qdx_devices[0])
+        if len(ports) == 1:
+            self.set_port(ports[0].device)
         elif len(qdx_devices) > 1:
-            raise OSError('Multiple QDX devices found, try specifying a serial port')
+            devices = ', '.join( [port.device for port in ports] )
+            raise IOError('Multiple QDX devices found, try specifying a serial port: {}'.format(devices))
         else:
-            raise OSError('QDX device not found, check device connection or specifiy a serial port')
+            raise IOError('QDX device not found, check device connection or specifiy a serial port')
 
     def set_port(self, port):
         if port is None:
             return
             
-        self.port = str(port)
+        self.port = port
         self.sync_local_settings()
 
     def get(self, cmd, update=False):
