@@ -38,9 +38,27 @@ class QDX:
     TX_STATE        = 'TQ'
     TX_MODE         = 'TX'
 
-    COMMANDS = [AF_GAIN, SIG_GEN_FREQ, VFO_A, VFO_B, RX_VFO_MODE, TX_VFO_MODE, FILTER_BW, RADIO_ID, RADIO_INFO, OPERATING_MODE, TXCO_FREQ, SIDEBAND, DEFAULT_FREQ, RX_GAIN, VOX_EN,
-        TX_RISE, TX_FALL, CYCLE_MIN, SAMPLE_MIN, DISCARD, IQ_MODE, JAPAN_BAND_LIM, NEG_RIT_OFFSET, RIT_STATUS, POS_RIT_OFFSET, RX_MODE, SPLIT_MODE, TX_STATE, TX_MODE]
+    # added in firmware v1.05
+    VERSION         = 'VN'
 
+    # added in firmware v1.06
+    CAT_TIMEOUT     = 'QC'
+    PTT_PORT        = 'QD'
+    VGA_PS2_TERM    = 'QE'
+    SERIAL1_BAUD    = 'QF'
+    SERIAL2_BAUD    = 'QG'
+    SERIAL3_BAUD    = 'QH'
+    NIGHT_MODE      = 'QI'
+    TX_SHIFT        = 'QJ'
+    
+
+    COMMANDS = [AF_GAIN, SIG_GEN_FREQ, VFO_A, VFO_B, RX_VFO_MODE, TX_VFO_MODE, FILTER_BW, RADIO_ID, RADIO_INFO, OPERATING_MODE, TXCO_FREQ, SIDEBAND, DEFAULT_FREQ, RX_GAIN, VOX_EN,
+        TX_RISE, TX_FALL, CYCLE_MIN, SAMPLE_MIN, DISCARD, IQ_MODE, JAPAN_BAND_LIM, NEG_RIT_OFFSET, RIT_STATUS, POS_RIT_OFFSET, RX_MODE, SPLIT_MODE, TX_STATE, TX_MODE, VERSION,
+        CAT_TIMEOUT, PTT_PORT, VGA_PS2_TERM, SERIAL1_BAUD, SERIAL2_BAUD, SERIAL3_BAUD, NIGHT_MODE, TX_SHIFT]
+
+    #TODO
+    # add new commands to map: http://qrp-labs.com/images/qdx/manual_operation_1_08.pdf
+    
     def __init__(self, port=None, autodetect=True):        
         self.command_map = {
             'AG' : {'get': self.get_af_gain,               'set': self.set_af_gain,                'label': 'Audio Gain',          'unit': '',     'options': None}, 
