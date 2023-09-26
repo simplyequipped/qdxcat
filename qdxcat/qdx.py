@@ -84,20 +84,34 @@ class QDX:
 
         if port is not None:
             self.set_port(port)
-        elif autodetect == True:
+        elif autodetect:
             self.autodetect()
 
     def autodetect(self):
-        # force generator to list
+        # linux port description: 'QDX Transceiver'
+        # windows port description: 'USB Serial Device (COMx)'
+
+        # try linux description
         ports = list( serial.tools.list_ports.grep('QDX Transceiver') )
 
-        if len(ports) == 1:
-            self.set_port(ports[0].device)
-        elif len(ports) > 1:
-            devices = ', '.join( [port.device for port in ports] )
-            raise IOError('Multiple QDX devices found, try specifying a serial port: {}'.format(devices))
-        else:
+        if len(ports) == 0:
+            # try windows description
+            ports = list( serial.tools.list_ports.grep('USB Serial Device') )
+            
+        if len(ports) == 0:
+            # no matching device description on linux or windows
             raise IOError('QDX device not found, check device connection or specifiy a serial port')
+
+        #TODO check radio ID string format
+        #TODO are there exceptions to handle when trying serial requests to unknown devices?
+        # check for QDX radio ID (Kenwood TS-480 = 020)
+        ports = [port for port in ports if self._serial_request(QDX.RADIO_ID, device = port.device) == '020']
+
+        if len(ports) > 1:
+            devices = ', '.join( [port.name for port in ports] )
+            raise IOError('Multiple QDX devices found, try specifying a serial port: {}'.format(devices))
+        
+        self.set_port(ports[0].device)
 
     def set_port(self, port, sync=True):
         if port is None:
@@ -156,22 +170,27 @@ class QDX:
         else:
             self.ptt_off()
     
-    def _serial_request(self, cmd, value = None):
-        if self.port is None:
-            raise ValueError('Serial port not set')
+    def _serial_request(self, cmd, value = None, device=None):
+        if device is None:
+            device = self.port
+        
+        if device is None:
+            raise ValueError('Serial port not specified')
             
         # build command string
         if value is not None:
+            # 'set' command
             request = str(cmd) + str(value) + ';'
         else:
+            # 'get' command
             request = str(cmd) + ';'
             
-        # encode command string to bytes
         request = request.encode('utf-8')
-
+                
         try:
-            with serial.Serial(self.port, self.baudrate, timeout=self.timeout) as serial_port:
+            with serial.Serial(device, self.baudrate, timeout=self.timeout) as serial_port:
                 serial_port.write(request)
+                #TODO use while loop to wait until in_waiting is True, accounting for timeout
                 time.sleep(0.1)
         
                 response = b''
@@ -183,7 +202,7 @@ class QDX:
                         response = serial_port.read_until(terminator=b';')
                         
         except Exception as e:
-            raise OSError('Error on serial port {}, check device connection'.format(self.port))
+            raise OSError('Error on serial port {}, check device connection'.format(device))
         
         # decode bytes to response string
         response = response.decode('utf-8')
@@ -199,17 +218,12 @@ class QDX:
 
         return response
     
-        # TODO check if some command reaponses should be float instead of int, error may be:
-        # 'invalid literal for int() with base 10'
-
-    # TODO CAT command not working
     def get_af_gain(self):
         gain = self._serial_request(QDX.AF_GAIN)
         if gain != None:
             gain = int(gain)
         return gain
 
-    # TODO CAT command not working
     def set_af_gain(self, value):
         value = int(value)
         self._serial_request(QDX.AF_GAIN, value)
