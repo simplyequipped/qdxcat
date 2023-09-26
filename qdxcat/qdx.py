@@ -93,7 +93,7 @@ class QDX:
 
         if len(ports) == 1:
             self.set_port(ports[0].device)
-        elif len(qdx_devices) > 1:
+        elif len(ports) > 1:
             devices = ', '.join( [port.device for port in ports] )
             raise IOError('Multiple QDX devices found, try specifying a serial port: {}'.format(devices))
         else:
