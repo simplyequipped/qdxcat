@@ -35,7 +35,7 @@ from serial.tools.list_ports import grep
 
 
 #TODO
-# update map options to map int values to str option labels
+# update map options to map int values to str option descriptions
 
 class QDX:
     '''QDX transceiver control object.
@@ -162,66 +162,66 @@ class QDX:
                 'set': *set* function callable object, or None
                 'description': Command description string
                 'units': Command units string, or empty string
-                'options': *dict* of command options and text description, or None 
+                'options': *dict* of command options and text description, or None
             },
             ...
         }
         ```
 
         Args:
-            command_map (dict): map of command strings to associated data
+            command_map (dict): map of command strings to associated data (see structure above)
 
         Returns:
             qdxcat.QDX: Constructed QDX object
         '''
         self.command_map = {
-            'AG' : {'get': self.get_af_gain,                   'set': self.set_af_gain,                'label': 'Audio Gain',          'unit': 'dB',       'options': None}, 
-            'C2' : {'get': self.get_sig_gen_freq,              'set': self.set_sig_gen_freq,           'label': 'Signal Gen',          'unit': 'Hz',       'options': None}, 
-            'FA' : {'get': self.get_vfo_a,                     'set': self.set_vfo_a,                  'label': 'VFO A',               'unit': 'Hz',       'options': None}, 
-            'FB' : {'get': self.get_vfo_b,                     'set': self.set_vfo_b,                  'label': 'VFO B',               'unit': 'Hz',       'options': None}, 
-            'FR' : {'get': self.get_rx_vfo_mode,               'set': self.set_rx_vfo_mode,            'label': 'RX VFO Mode',         'unit': '',         'options': {'0':'VFO A', '1':'VFO B', '2':'Split'}}, 
-            'FT' : {'get': self.get_tx_vfo_mode,               'set': self.set_tx_vfo_mode,            'label': 'TX VFO Mode',         'unit': '',         'options': {'0':'VFO A', '1':'VFO B', '2':'Split'}}, 
-            'FW' : {'get': self.get_filter_bw,                 'set': None,                            'label': 'Filter Bandwidth',    'unit': 'Hz',       'options': None}, 
-            'ID' : {'get': self.get_radio_id,                  'set': None,                            'label': 'Radio ID',            'unit': '',         'options': None}, 
-            'IF' : {'get': self.get_radio_info_dict,           'set': None,                            'label': 'Radio Info',          'unit': '',         'options': None}, 
-            'MD' : {'get': self.get_operating_mode,            'set': self.set_operating_mode,         'label': 'Operating Mode',      'unit': '',         'options': {'1':'LSB', '3':'USB'}}, 
-            'Q0' : {'get': self.get_txco_freq,                 'set': self.set_txco_freq,              'label': 'TXCO',                'unit': 'Hz',       'options': None}, 
-            'Q1' : {'get': self.get_sideband,                  'set': self.set_sideband,               'label': 'Sideband',            'unit': '',         'options': {'0':'USB', '1':'LSB'}}, 
-            'Q2' : {'get': self.get_default_freq,              'set': self.set_default_freq,           'label': 'Default Freq',        'unit': 'Hz',       'options': None}, 
-            'Q3' : {'get': self.get_vox_enable,                'set': self.set_vox_enable,             'label': 'VOX',                 'unit': '',         'options': {'0':'Off', '1':'On'}}, 
-            'Q4' : {'get': self.get_tx_rise_threshold,         'set': self.set_tx_rise_threshold,      'label': 'TX Rise',             'unit': '%',        'options': None}, 
-            'Q5' : {'get': self.get_tx_fall_threshold,         'set': self.set_tx_fall_threshold,      'label': 'TX Fall',             'unit': '%',        'options': None}, 
-            'Q6' : {'get': self.get_cycle_min_parameter,       'set': self.set_cycle_min_parameter,    'label': 'Cycle Min',           'unit': 'cycles',   'options': None}, 
-            'Q7' : {'get': self.get_sample_min_parameter,      'set': self.set_sample_min_parameter,   'label': 'Sample Min',          'unit': 'samples',  'options': None}, 
-            'Q8' : {'get': self.get_discard_parameter,         'set': self.set_discard_parameter,      'label': 'Discard',             'unit': 'cycles',   'options': None}, 
-            'Q9' : {'get': self.get_iq_mode,                   'set': self.set_iq_mode,                'label': 'IQ Mode',             'unit': '',         'options': {'0':'Off', '1':'On'}}, 
-            'QA' : {'get': self.get_japan_band_limit_mode,     'set': self.set_japan_band_limit_mode,  'label': 'Japan Band Mode',     'unit': '',         'options': {'0':'Off', '1':'On'}},
-            'QB' : {'get': self.get_cat_timeout_en,            'set': self.set_cat_timeout_en,         'label': 'CAT Timeout Enable',  'unit': '',         'options': {'0':'Off', '1':'On'}},
-            'QC' : {'get': self.get_cat_timeout,               'set': self.set_cat_timeout,            'label': 'CAT Timeout',         'unit': 'sec',      'options': None},
-            'QD' : {'get': self.get_ptt_port_serial,           'set': self.set_ptt_port_serial,        'label': 'PTT Port as Serial',  'unit': '',         'options': {'0':'Off', '1':'On'}},
-            'QE' : {'get': self.get_vga_ps2_mode,              'set': self.set_vga_ps2_mode,           'label': 'VGA PS/2 Mode',       'unit': '',         'options': {'0':'Off', '1':'On'}},
-            'QF' : {'get': self.get_serial1_baud,              'set': self.set_serial1_baud,           'label': 'Serial 1 Baud Rate',  'unit': 'baud',     'options': None},
-            'QG' : {'get': self.get_serial2_baud,              'set': self.set_serial2_baud,           'label': 'Serial 2 Baud Rate',  'unit': 'baud',     'options': None},
-            'QH' : {'get': self.get_serial3_baud,              'set': self.set_serial3_baud,           'label': 'Serial 3 Baud Rate',  'unit': 'baud',     'options': None},
-            'QI' : {'get': self.get_night_mode,                'set': self.set_night_mode,             'label': 'Night Mode',          'unit': '',         'options': {'0':'Off', '1':'On'}},
-            'QJ' : {'get': self.get_tx_shift,                  'set': self.set_tx_shift,               'label': 'TX Shift',            'unit': 'mHz',      'options': None},
-            '_Q3' : {'get': self.get_rx_gain,                  'set': self.set_rx_gain,                'label': 'RX Gain',             'unit': '',         'options': None}, 
-            '_Q4' : {'get': self.get_vox_enable,               'set': self.set_vox_enable,             'label': 'VOX',                 'unit': '',         'options': {'0':'Off', '1':'On'}}, 
-            '_Q5' : {'get': self.get_tx_rise_threshold,        'set': self.set_tx_rise_threshold,      'label': 'TX Rise',             'unit': '%',        'options': None}, 
-            '_Q6' : {'get': self.get_tx_fall_threshold,        'set': self.set_tx_fall_threshold,      'label': 'TX Fall',             'unit': '%',        'options': None}, 
-            '_Q7' : {'get': self.get_cycle_min_parameter,      'set': self.set_cycle_min_parameter,    'label': 'Cycle Min',           'unit': 'cycles',   'options': None}, 
-            '_Q8' : {'get': self.get_sample_min_parameter,     'set': self.set_sample_min_parameter,   'label': 'Sample Min',          'unit': 'samples',  'options': None}, 
-            '_Q9' : {'get': self.get_discard_parameter,        'set': self.set_discard_parameter,      'label': 'Discard',             'unit': 'cycles',   'options': None}, 
-            '_QA' : {'get': self.get_iq_mode,                  'set': self.set_iq_mode,                'label': 'IQ Mode',             'unit': '',         'options': {'0':'Off', '1':'On'}}, 
-            '_QB' : {'get': self.get_japan_band_limit_mode,    'set': self.set_japan_band_limit_mode,  'label': 'Japan Band Mode',     'unit': '',         'options': {'0':'Off', '1':'On'}},  
-            'RD' : {'get': None,                               'set': self.set_negative_rit_offset,    'label': 'Neg RIT Offset',      'unit': 'Hz',       'options': None}, 
-            'RT' : {'get': self.get_rit_status,                'set': None,                            'label': 'RIT',                 'unit': '',         'options': {'0':'Off', '1':'On'}}, 
-            'RU' : {'get': None,                               'set': self.set_positive_rit_offset,    'label': 'Pos RIT Offset',      'unit': 'Hz',       'options': None}, 
-            'RX' : {'get': None,                               'set': self.set_rx,                     'label': 'RX',                  'unit': '',         'options': None}, 
-            'SP' : {'get': self.get_split_mode,                'set': self.set_split_mode,             'label': 'Split Mode',          'unit': '',         'options': {'0':'Off', '1':'On'}}, 
-            'TQ' : {'get': self.get_tx_state,                  'set': self.set_tx_state,               'label': 'RX/TX State',         'unit': '',         'options': {'0':'RX', '1':'TX'}}, 
-            'TX' : {'get': None,                               'set': self.set_tx,                     'label': 'TX',                  'unit': '',         'options': None},
-            'VN' : {'get': self.get_version,                   'set': None,                            'label': 'Firmware Version',    'unit': '',         'options': None}
+            'AG' : {'get': self.get_af_gain,                   'set': self.set_af_gain,                'description': 'Audio Gain',          'unit': 'dB',       'options': None},
+            'C2' : {'get': self.get_sig_gen_freq,              'set': self.set_sig_gen_freq,           'description': 'Signal Gen',          'unit': 'Hz',       'options': None},
+            'FA' : {'get': self.get_vfo_a,                     'set': self.set_vfo_a,                  'description': 'VFO A',               'unit': 'Hz',       'options': None},
+            'FB' : {'get': self.get_vfo_b,                     'set': self.set_vfo_b,                  'description': 'VFO B',               'unit': 'Hz',       'options': None},
+            'FR' : {'get': self.get_rx_vfo_mode,               'set': self.set_rx_vfo_mode,            'description': 'RX VFO Mode',         'unit': '',         'options': {0:'VFO A', 1:'VFO B', 2:'Split'}},
+            'FT' : {'get': self.get_tx_vfo_mode,               'set': self.set_tx_vfo_mode,            'description': 'TX VFO Mode',         'unit': '',         'options': {0:'VFO A', 1:'VFO B', 2:'Split'}},
+            'FW' : {'get': self.get_filter_bw,                 'set': None,                            'description': 'Filter Bandwidth',    'unit': 'Hz',       'options': None},
+            'ID' : {'get': self.get_radio_id,                  'set': None,                            'description': 'Radio ID',            'unit': '',         'options': None},
+            'IF' : {'get': self.get_radio_info_dict,           'set': None,                            'description': 'Radio Info',          'unit': '',         'options': None},
+            'MD' : {'get': self.get_operating_mode,            'set': self.set_operating_mode,         'description': 'Operating Mode',      'unit': '',         'options': {1:'LSB', 3:'USB'}},
+            'Q0' : {'get': self.get_txco_freq,                 'set': self.set_txco_freq,              'description': 'TXCO',                'unit': 'Hz',       'options': None},
+            'Q1' : {'get': self.get_sideband,                  'set': self.set_sideband,               'description': 'Sideband',            'unit': '',         'options': {0:'USB', 1:'LSB'}},
+            'Q2' : {'get': self.get_default_freq,              'set': self.set_default_freq,           'description': 'Default Freq',        'unit': 'Hz',       'options': None},
+            'Q3' : {'get': self.get_vox_enable,                'set': self.set_vox_enable,             'description': 'VOX',                 'unit': '',         'options': {0:'Disabled', 1:'Enabled'}},
+            'Q4' : {'get': self.get_tx_rise_threshold,         'set': self.set_tx_rise_threshold,      'description': 'TX Rise',             'unit': '%',        'options': None},
+            'Q5' : {'get': self.get_tx_fall_threshold,         'set': self.set_tx_fall_threshold,      'description': 'TX Fall',             'unit': '%',        'options': None},
+            'Q6' : {'get': self.get_cycle_min_parameter,       'set': self.set_cycle_min_parameter,    'description': 'Cycle Min',           'unit': 'cycles',   'options': None},
+            'Q7' : {'get': self.get_sample_min_parameter,      'set': self.set_sample_min_parameter,   'description': 'Sample Min',          'unit': 'samples',  'options': None},
+            'Q8' : {'get': self.get_discard_parameter,         'set': self.set_discard_parameter,      'description': 'Discard',             'unit': 'cycles',   'options': None},
+            'Q9' : {'get': self.get_iq_mode,                   'set': self.set_iq_mode,                'description': 'IQ Mode',             'unit': '',         'options': {0:'Disabled', 1:'Enabled'}},
+            'QA' : {'get': self.get_japan_band_limit_mode,     'set': self.set_japan_band_limit_mode,  'description': 'Japan Band Mode',     'unit': '',         'options': {0:'Disabled', 1:'Enabled'}},
+            'QB' : {'get': self.get_cat_timeout_enable,        'set': self.set_cat_timeout_enable,     'description': 'CAT Timeout Enable',  'unit': '',         'options': {0:'Disabled', 1:'Enabled'}},
+            'QC' : {'get': self.get_cat_timeout,               'set': self.set_cat_timeout,            'description': 'CAT Timeout',         'unit': 'sec',      'options': None},
+            'QD' : {'get': self.get_ptt_port_serial,           'set': self.set_ptt_port_serial,        'description': 'PTT Port as Serial',  'unit': '',         'options': {0:'Disabled', 1:'Enabled'}},
+            'QE' : {'get': self.get_vga_ps2_mode,              'set': self.set_vga_ps2_mode,           'description': 'VGA PS/2 Mode',       'unit': '',         'options': {0:'Disabled', 1:'Enabled'}},
+            'QF' : {'get': self.get_serial1_baud,              'set': self.set_serial1_baud,           'description': 'Serial 1 Baud Rate',  'unit': 'baud',     'options': None},
+            'QG' : {'get': self.get_serial2_baud,              'set': self.set_serial2_baud,           'description': 'Serial 2 Baud Rate',  'unit': 'baud',     'options': None},
+            'QH' : {'get': self.get_serial3_baud,              'set': self.set_serial3_baud,           'description': 'Serial 3 Baud Rate',  'unit': 'baud',     'options': None},
+            'QI' : {'get': self.get_night_mode,                'set': self.set_night_mode,             'description': 'Night Mode',          'unit': '',         'options': {0:'Disabled', 1:'Enabled'}},
+            'QJ' : {'get': self.get_tx_shift,                  'set': self.set_tx_shift,               'description': 'TX Shift',            'unit': 'mHz',      'options': None},
+            'RD' : {'get': None,                               'set': self.set_negative_rit_offset,    'description': 'Neg RIT Offset',      'unit': 'Hz',       'options': None},
+            'RT' : {'get': self.get_rit_status,                'set': None,                            'description': 'RIT',                 'unit': '',         'options': {0:'Disabled', 1:'Enabled'}},
+            'RU' : {'get': None,                               'set': self.set_positive_rit_offset,    'description': 'Pos RIT Offset',      'unit': 'Hz',       'options': None},
+            'RX' : {'get': None,                               'set': self.set_rx,                     'description': 'RX',                  'unit': '',         'options': None},
+            'SP' : {'get': self.get_split_mode,                'set': self.set_split_mode,             'description': 'Split Mode',          'unit': '',         'options': {0:'Disabled', 1:'Enabled'}},
+            'TQ' : {'get': self.get_tx_state,                  'set': self.set_tx_state,               'description': 'RX/TX State',         'unit': '',         'options': {0:'RX', 1:'TX'}},
+            'TX' : {'get': None,                               'set': self.set_tx,                     'description': 'TX',                  'unit': '',         'options': None},
+            'VN' : {'get': self.get_version,                   'set': None,                            'description': 'Firmware Version',    'unit': '',         'options': None},
+            '_Q3' : {'get': self.get_rx_gain,                  'set': self.set_rx_gain,                'description': 'RX Gain',             'unit': '',         'options': None},
+            '_Q4' : {'get': self.get_vox_enable,               'set': self.set_vox_enable,             'description': 'VOX',                 'unit': '',         'options': {0:'Disabled', 1:'Enabled'}},
+            '_Q5' : {'get': self.get_tx_rise_threshold,        'set': self.set_tx_rise_threshold,      'description': 'TX Rise',             'unit': '%',        'options': None},
+            '_Q6' : {'get': self.get_tx_fall_threshold,        'set': self.set_tx_fall_threshold,      'description': 'TX Fall',             'unit': '%',        'options': None},
+            '_Q7' : {'get': self.get_cycle_min_parameter,      'set': self.set_cycle_min_parameter,    'description': 'Cycle Min',           'unit': 'cycles',   'options': None},
+            '_Q8' : {'get': self.get_sample_min_parameter,     'set': self.set_sample_min_parameter,   'description': 'Sample Min',          'unit': 'samples',  'options': None}, 
+            '_Q9' : {'get': self.get_discard_parameter,        'set': self.set_discard_parameter,      'description': 'Discard',             'unit': 'cycles',   'options': None},
+            '_QA' : {'get': self.get_iq_mode,                  'set': self.set_iq_mode,                'description': 'IQ Mode',             'unit': '',         'options': {0:'Disabled', 1:'Enabled'}},
+            '_QB' : {'get': self.get_japan_band_limit_mode,    'set': self.set_japan_band_limit_mode,  'description': 'Japan Band Mode',     'unit': '',         'options': {0:'Disabled', 1:'Enabled'}}
         }
 
         self.settings = {}
@@ -274,24 +274,65 @@ class QDX:
             thread.daemon = True
             thread.start()
 
-    def get(self, cmd, update=False):
+    def get(self, cmd, option=False, update=False):
+        '''Get command value.
+
+        Args:
+            cmd (str): Command to set value for
+            option (bool): Return option *str* if True, or raw *int* value if False, defaults to False
+            update (bool): Update local settings from QDX settings if True, or use local settings if False, defaults to False
+
+        Returns:
+            int: Current command value
+            str: Current command value option *str* (see `command_map[CMD]['options'].values()`)
+        '''
         if cmd not in QDX.COMMANDS:
             raise ValueError('Invalid QDX command: {}'.format(cmd))
             
         if update or cmd not in self.settings:
             self.sync_local_setting(cmd)
-        
+
+        if option and self.command_map[cmd]['options'] is not None:
+            value = self.settings[cmd]
+            return self.command_map[cmd]['options'][value]
+            
         return self.settings[cmd]
 
     def set(self, cmd, value):
+        '''Set command value.
+
+        If *value* is type *str*, it must be an option string found in `command_map[CMD]['options'].values()` which will be mapped to the corresponding option key.
+
+        Args:
+            cmd (str): Command to set value for
+            value (int or str): Command value to set
+
+        Returns:
+            int: Current command value, if *value* is type *int*
+            str: Current command value option *str* (see *command_map*), if *value* is type *str*
+
+        Raises:
+            ValueError: Invalid QDX command
+        '''
+        # return option str (value) instead of int (key) from command map
+        option = False
+        
         if cmd not in QDX.COMMANDS:
             raise ValueError('Invalid QDX command: {}'.format(cmd))
+
+        if type(value) == str:
+            option = True
+            # get option int (key) based on option str (value) from command map
+            for key, val in self.command_map[cmd]['options']:
+                if val.lower() == value.lower():
+                    value = key
+                    break
             
         if self.command_map[cmd]['set'] is not None:
             # set command value
             self.command_map[cmd]['set'](value)
 
-        return self.get(cmd, update=True)
+        return self.get(cmd, option=option, update=True)
 
     def sync_local_setting(self, cmd):
         with self._settings_lock:
@@ -647,13 +688,13 @@ class QDX:
             state = float( state.replace('_', '.') )
         return state
 
-    def get_cat_timeout_en(self):
+    def get_cat_timeout_enable(self):
         state = self._serial_request(QDX.CAT_TIMEOUT_EN)
         if state is not None:
             state = int(state)
         return state
 
-    def set_cat_timeout_en(self, value):
+    def set_cat_timeout_enable(self, value):
         value = int(value)
         self._serial_request(QDX.CAT_TIMEOUT_EN, value)
 
