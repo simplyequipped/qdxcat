@@ -23,6 +23,8 @@
 '''QRPLabs QDX transceiver CAT control.
 
 QDX commands are based on the Kenwood TS-480 command set.
+
+**Note:** A significant change in commands took place in QDX firmware v1.06. The previous commands (from v1.03) are available with an underscore prefix for backwards compatibility. Upgrading to the latest QDX firmware is recommended. See the [QRPLabs QDX manual](http://qrp-labs.com/qdx) for upgrade instructions.
 '''
 
 __docformat__ = 'google'
@@ -39,8 +41,6 @@ from serial.tools.list_ports import grep
 
 class QDX:
     '''QDX transceiver control object.
-
-    A significant change in commands took place in firmware v1.06. The previous v1.03 commands are available with *_XX* prefix for backwards compatibility. Upgrading to the latest device firmware is recommended. See the [QRPLabs QDX manual](http://qrp-labs.com/qdx) for upgrade instructions.
     
     *command_map* structure:
     ```
