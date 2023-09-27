@@ -521,7 +521,7 @@ class QDX:
         self._serial_request(QDX.TX_MODE)
 
     def get_version(self):
-        self._serial_request(QDX.VERSION)
+        state = self._serial_request(QDX.VERSION)
         if state is not None:
             state = float( state.replace('_', '.') )
         return state
@@ -605,3 +605,4 @@ class QDX:
     def set_tx_shift(self, value):
         value = int(value)
         self._serial_request(QDX.TX_SHIFT, value)
+
