@@ -94,12 +94,12 @@ class QDX:
             'VN' : {'get': self.get_version,               'set': None,                            'label': 'Firmware Version',    'unit': '',     'options': None},
             # added in firmware v1.06
             'QC' : {'get': self.get_cat_timeout,           'set': self.set_cat_timeout,            'label': 'CAT Timeout',         'unit': '',     'options': None},
-            'QD' : {'get': self.get_ptt_port_serial,       'set': self.set_ptt_port_serial,        'label': 'PTT Port as Serial',  'unit': '',     'options': {'0':'Off', '1':'On'},
-            'QE' : {'get': self.get_vga_ps2_mode,          'set': self.set_vga_ps2_mode,           'label': 'VGA PS/2 Mode',       'unit': '',     'options': {'0':'Off', '1':'On'},
+            'QD' : {'get': self.get_ptt_port_serial,       'set': self.set_ptt_port_serial,        'label': 'PTT Port as Serial',  'unit': '',     'options': {'0':'Off', '1':'On'}},
+            'QE' : {'get': self.get_vga_ps2_mode,          'set': self.set_vga_ps2_mode,           'label': 'VGA PS/2 Mode',       'unit': '',     'options': {'0':'Off', '1':'On'}},
             'QF' : {'get': self.get_serial1_baud,          'set': self.set_serial1_baud,           'label': 'Serial 1 Baud Rate',  'unit': '',     'options': None},
             'QG' : {'get': self.get_serial2_baud,          'set': self.set_serial2_baud,           'label': 'Serial 2 Baud Rate',  'unit': '',     'options': None},
             'QH' : {'get': self.get_serial3_baud,          'set': self.set_serial3_baud,           'label': 'Serial 3 Baud Rate',  'unit': '',     'options': None},
-            'QI' : {'get': self.get_night_mode,            'set': self.set_night_mode,             'label': 'Night Mode',          'unit': '',     'options': {'0':'Off', '1':'On'},
+            'QI' : {'get': self.get_night_mode,            'set': self.set_night_mode,             'label': 'Night Mode',          'unit': '',     'options': {'0':'Off', '1':'On'}},
             'QJ' : {'get': self.get_tx_shift,              'set': self.set_tx_shift,               'label': 'TX Shift',            'unit': '',     'options': None}
         }
 
