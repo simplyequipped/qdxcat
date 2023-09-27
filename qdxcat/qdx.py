@@ -36,9 +36,6 @@ import threading
 from serial.tools.list_ports import grep
 
 
-#TODO
-# update map options to map int values to str option descriptions
-
 class QDX:
     '''QDX transceiver control object.
     
