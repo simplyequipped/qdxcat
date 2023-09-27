@@ -40,9 +40,25 @@ from serial.tools.list_ports import grep
 class QDX:
     '''QDX transceiver control object.
 
-    A significant change in commands took place in firmware v1.0., The previous v1.03 commands are available for backwards compatibility and have a *_XX* prefix. Upgradeing to the latest firmware is recommended.
+    A significant change in commands took place in firmware v1.06. The previous v1.03 commands are available with *_XX* prefix for backwards compatibility. Upgrading to the latest device firmware is recommended. See the [QRPLabs QDX manual](http://qrp-labs.com/qdx) for upgrade instructions.
     
+    *command_map* structure:
+    ```
+    {
+        'CMD' : {
+            'get': *get* function callable object, or None
+            'set': *set* function callable object, or None
+            'description': Command description string
+            'units': Command units string, or empty string
+            'options': *dict* of command options and text description, or None
+        },
+        ...
+    }
+    ```
+        
     Attributes:
+        command_map (dict): map of command strings to associated data (see structure above)
+        settings (dict): map of commands and current local values
         COMMANDS (list): list of command variables shown below
 
         | Command | Value | Minimum Firmware Version |
@@ -77,6 +93,14 @@ class QDX:
         | SERIAL3_BAUD     | 'QH'  | 1.06 |
         | NIGHT_MODE       | 'QI'  | 1.06 |
         | TX_SHIFT         | 'QJ'  | 1.06 |
+        | NEG_RIT_OFFSET   | 'RD'  | 1.03 |
+        | RIT_STATUS       | 'RT'  | 1.03 |
+        | POS_RIT_OFFSET   | 'RU'  | 1.03 |
+        | RX_MODE          | 'RX'  | 1.03 |
+        | SPLIT_MODE       | 'SP'  | 1.03 |
+        | TX_STATE         | 'TQ'  | 1.03 |
+        | TX_MODE          | 'TX'  | 1.03 |
+        | VERSION          | 'VN'  | 1.05 |
         | _RX_GAIN         | '_Q3' | 1.03 |
         | _VOX_EN          | '_Q4' | 1.03 |
         | _TX_RISE         | '_Q5' | 1.03 |
@@ -86,14 +110,6 @@ class QDX:
         | _DISCARD         | '_Q9' | 1.03 |
         | _IQ_MODE         | '_QA' | 1.03 |
         | _JAPAN_BAND_LIM  | '_QB' | 1.03 |
-        | NEG_RIT_OFFSET   | 'RD'  | 1.03 |
-        | RIT_STATUS       | 'RT'  | 1.03 |
-        | POS_RIT_OFFSET   | 'RU'  | 1.03 |
-        | RX_MODE          | 'RX'  | 1.03 |
-        | SPLIT_MODE       | 'SP'  | 1.03 |
-        | TX_STATE         | 'TQ'  | 1.03 |
-        | TX_MODE          | 'TX'  | 1.03 |
-        | VERSION          | 'VN'  | 1.05 |
     '''
     
     # QDX CAT commands
@@ -154,22 +170,9 @@ class QDX:
     def __init__(self, port=None, autodetect=True):
         '''Initialize QDX instance object.
 
-        *command_map* structure:
-        ```
-        {
-            'CMD' : {
-                'get': *get* function callable object, or None
-                'set': *set* function callable object, or None
-                'description': Command description string
-                'units': Command units string, or empty string
-                'options': *dict* of command options and text description, or None
-            },
-            ...
-        }
-        ```
-
         Args:
-            command_map (dict): map of command strings to associated data (see structure above)
+            port (str): Windows COM port (ex. 'COM42') or Unix serial device path (ex. '/dev/ttyACM0'), defaults to None
+            autodetect (bool): Whether to auto-detect QDX device serial port, defaults to True
 
         Returns:
             qdxcat.QDX: Constructed QDX object
@@ -228,9 +231,9 @@ class QDX:
         self._settings_lock = threading.Lock()
         
         # serial port config
-        self.port = None
-        self.baudrate = 9600
-        self.timeout = 1
+        self._port = None
+        self._baudrate = 9600
+        self._timeout = 1
 
         if port is not None:
             self.set_port(port)
@@ -238,6 +241,7 @@ class QDX:
             self.autodetect()
 
     def autodetect(self):
+        '''Auto-detect QDX device serial port.'''
         # linux port description: 'QDX Transceiver'
         # windows port description: 'USB Serial Device (COMx)'
 
@@ -264,10 +268,16 @@ class QDX:
         self.set_port(ports[0].device)
 
     def set_port(self, port, sync=True):
+        '''Set QDX device serial port.
+
+        Args:
+            port (str): COM port (ex. 'COM42') or serial device path (ex. '/dev/ttyACM0')
+            sync (bool): Whether to sync local settings to transceiver settings, defaults to True
+        '''
         if port is None:
             return
             
-        self.port = port
+        self._port = port
 
         if sync:
             thread = threading.Thread(target=self.sync_local_settings)
@@ -315,13 +325,13 @@ class QDX:
             ValueError: Invalid QDX command
         '''
         # return option str (value) instead of int (key) from command map
-        option = False
+        option_str = False
         
         if cmd not in QDX.COMMANDS:
             raise ValueError('Invalid QDX command: {}'.format(cmd))
 
         if type(value) == str:
-            option = True
+            option_str = True
             # get option int (key) based on option str (value) from command map
             for key, val in self.command_map[cmd]['options']:
                 if val.lower() == value.lower():
@@ -332,9 +342,18 @@ class QDX:
             # set command value
             self.command_map[cmd]['set'](value)
 
-        return self.get(cmd, option=option, update=True)
+        return self.get(cmd, option=option_str, update=True)
 
     def sync_local_setting(self, cmd):
+        '''Sync local setting with transceiver setting.
+
+        Args:
+            cmd (str): Command to sync
+
+        Raises:
+            ValueError: Invalid QDX command
+            ValueError: Error processing command
+        '''
         with self._settings_lock:
             if cmd not in QDX.COMMANDS:
                 raise ValueError('Invalid QDX command: {}'.format(cmd))
@@ -346,24 +365,40 @@ class QDX:
                     raise ValueError('Error processing command: {}'.format(cmd)) from e
     
     def sync_local_settings(self):
+        '''Sync all local settings with transceiver settings.'''
         for cmd in QDX.COMMANDS:
             self.sync_local_setting(cmd)
 
     def ptt_on(self):
+        '''Set PTT to transmit state.'''
         self.set(QDX.TX_STATE, 1)
                           
     def ptt_off(self):
+        '''Set PTT to receive state.'''
         self.set(QDX.TX_STATE, 0)
         
     def toggle_ptt(self):
+        '''Toggle PTT state.'''
         if self.get(QDX.TX_STATE) == 0:
             self.ptt_on()
         else:
             self.ptt_off()
     
-    def _serial_request(self, cmd, value = None, device=None):
+    def _serial_request(self, cmd, value=None, device=None):
+        '''Process get/set serial request.
+
+        If *value* is not set, a get process takes place. If *value* is set, a set process takes place.
+
+        Args:
+            cmd (str): Command to get or set
+            value (int): Command value to set
+            device (str): Serial device port *str* to use instead of QDX.port
+
+        Raises:
+            OSError: Error during serial port request/response
+        '''
         if device is None:
-            device = self.port
+            device = self._port
         
         if device is None:
             raise ValueError('Serial port not specified')
@@ -379,7 +414,7 @@ class QDX:
         request = request.encode('utf-8')
                 
         try:
-            with serial.Serial(device, self.baudrate, timeout=self.timeout) as serial_port:
+            with serial.Serial(device, self._baudrate, timeout=self._timeout) as serial_port:
                 serial_port.write(request)
                 #TODO use while loop to wait until in_waiting is True, accounting for timeout
                 time.sleep(0.1)
@@ -393,7 +428,7 @@ class QDX:
                         response = serial_port.read_until(terminator=b';')
                         
         except Exception as e:
-            raise OSError('Error on serial port {}, check device connection'.format(device))
+            raise OSError('Error during serial port request/response {}, check device connection'.format(device))
         
         # decode bytes to response string
         response = response.decode('utf-8')
