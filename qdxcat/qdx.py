@@ -52,61 +52,63 @@ class QDX:
         ...
     }
     ```
-        
+    
+    Supported Commands:
+    
+    | Command | Value | Minimum Firmware Version |
+    | -------- | -------- | -------- |
+    | AUDIO_GAIN       | 'AG'  | 1.03 |
+    | SIG_GEN_FREQ     | 'C2'  | 1.03 |
+    | VFO_A            | 'FA'  | 1.03 |
+    | VFO_B            | 'FB'  | 1.03 |
+    | RX_VFO_MODE      | 'FR'  | 1.03 |
+    | TX_VFO_MODE      | 'FT'  | 1.03 |
+    | FILTER_BW        | 'FW'  | 1.03 |
+    | RADIO_ID         | 'ID'  | 1.03 |
+    | RADIO_INFO       | 'IF'  | 1.03 |
+    | OPERATING_MODE   | 'MD'  | 1.03 |
+    | TXCO_FREQ        | 'Q0'  | 1.03 |
+    | SIDEBAND         | 'Q1'  | 1.03 |
+    | DEFAULT_FREQ     | 'Q2'  | 1.03 |
+    | VOX_EN           | 'Q3'  | 1.06 |
+    | TX_RISE          | 'Q4'  | 1.06 |
+    | TX_FALL          | 'Q5'  | 1.06 |
+    | CYCLE_MIN        | 'Q6'  | 1.06 |
+    | SAMPLE_MIN       | 'Q7'  | 1.06 |
+    | DISCARD          | 'Q8'  | 1.06 |
+    | IQ_MODE          | 'Q9'  | 1.06 |
+    | JAPAN_BAND_LIM   | 'QA'  | 1.06 |
+    | CAT_TIMEOUT_EN   | 'QB'  | 1.06 |
+    | CAT_TIMEOUT      | 'QC'  | 1.06 |
+    | PTT_PORT_SERIAL  | 'QD'  | 1.06 |
+    | VGA_PS2_MODE     | 'QE'  | 1.06 |
+    | SERIAL1_BAUD     | 'QF'  | 1.06 |
+    | SERIAL2_BAUD     | 'QG'  | 1.06 |
+    | SERIAL3_BAUD     | 'QH'  | 1.06 |
+    | NIGHT_MODE       | 'QI'  | 1.06 |
+    | TX_SHIFT         | 'QJ'  | 1.06 |
+    | NEG_RIT_OFFSET   | 'RD'  | 1.03 |
+    | RIT_STATUS       | 'RT'  | 1.03 |
+    | POS_RIT_OFFSET   | 'RU'  | 1.03 |
+    | RX_MODE          | 'RX'  | 1.03 |
+    | SPLIT_MODE       | 'SP'  | 1.03 |
+    | TX_STATE         | 'TQ'  | 1.03 |
+    | TX_MODE          | 'TX'  | 1.03 |
+    | VERSION          | 'VN'  | 1.05 |
+    | _RX_GAIN         | '_Q3' | 1.03 |
+    | _VOX_EN          | '_Q4' | 1.03 |
+    | _TX_RISE         | '_Q5' | 1.03 |
+    | _TX_FALL         | '_Q6' | 1.03 |
+    | _CYCLE_MIN       | '_Q7' | 1.03 |
+    | _SAMPLE_MIN      | '_Q8' | 1.03 |
+    | _DISCARD         | '_Q9' | 1.03 |
+    | _IQ_MODE         | '_QA' | 1.03 |
+    | _JAPAN_BAND_LIM  | '_QB' | 1.03 |
+    
     Attributes:
         command_map (dict): map of command strings to associated data (see structure above)
         settings (dict): map of commands and current local values
         COMMANDS (list): list of command variables shown below
-
-        | Command | Value | Minimum Firmware Version |
-        | -------- | -------- | -------- |
-        | AUDIO_GAIN       | 'AG'  | 1.03 |
-        | SIG_GEN_FREQ     | 'C2'  | 1.03 |
-        | VFO_A            | 'FA'  | 1.03 |
-        | VFO_B            | 'FB'  | 1.03 |
-        | RX_VFO_MODE      | 'FR'  | 1.03 |
-        | TX_VFO_MODE      | 'FT'  | 1.03 |
-        | FILTER_BW        | 'FW'  | 1.03 |
-        | RADIO_ID         | 'ID'  | 1.03 |
-        | RADIO_INFO       | 'IF'  | 1.03 |
-        | OPERATING_MODE   | 'MD'  | 1.03 |
-        | TXCO_FREQ        | 'Q0'  | 1.03 |
-        | SIDEBAND         | 'Q1'  | 1.03 |
-        | DEFAULT_FREQ     | 'Q2'  | 1.03 |
-        | VOX_EN           | 'Q3'  | 1.06 |
-        | TX_RISE          | 'Q4'  | 1.06 |
-        | TX_FALL          | 'Q5'  | 1.06 |
-        | CYCLE_MIN        | 'Q6'  | 1.06 |
-        | SAMPLE_MIN       | 'Q7'  | 1.06 |
-        | DISCARD          | 'Q8'  | 1.06 |
-        | IQ_MODE          | 'Q9'  | 1.06 |
-        | JAPAN_BAND_LIM   | 'QA'  | 1.06 |
-        | CAT_TIMEOUT_EN   | 'QB'  | 1.06 |
-        | CAT_TIMEOUT      | 'QC'  | 1.06 |
-        | PTT_PORT_SERIAL  | 'QD'  | 1.06 |
-        | VGA_PS2_MODE     | 'QE'  | 1.06 |
-        | SERIAL1_BAUD     | 'QF'  | 1.06 |
-        | SERIAL2_BAUD     | 'QG'  | 1.06 |
-        | SERIAL3_BAUD     | 'QH'  | 1.06 |
-        | NIGHT_MODE       | 'QI'  | 1.06 |
-        | TX_SHIFT         | 'QJ'  | 1.06 |
-        | NEG_RIT_OFFSET   | 'RD'  | 1.03 |
-        | RIT_STATUS       | 'RT'  | 1.03 |
-        | POS_RIT_OFFSET   | 'RU'  | 1.03 |
-        | RX_MODE          | 'RX'  | 1.03 |
-        | SPLIT_MODE       | 'SP'  | 1.03 |
-        | TX_STATE         | 'TQ'  | 1.03 |
-        | TX_MODE          | 'TX'  | 1.03 |
-        | VERSION          | 'VN'  | 1.05 |
-        | _RX_GAIN         | '_Q3' | 1.03 |
-        | _VOX_EN          | '_Q4' | 1.03 |
-        | _TX_RISE         | '_Q5' | 1.03 |
-        | _TX_FALL         | '_Q6' | 1.03 |
-        | _CYCLE_MIN       | '_Q7' | 1.03 |
-        | _SAMPLE_MIN      | '_Q8' | 1.03 |
-        | _DISCARD         | '_Q9' | 1.03 |
-        | _IQ_MODE         | '_QA' | 1.03 |
-        | _JAPAN_BAND_LIM  | '_QB' | 1.03 |
     '''
     
     # QDX CAT commands
