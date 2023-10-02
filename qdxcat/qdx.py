@@ -24,7 +24,7 @@
 
 QDX commands are based on the Kenwood TS-480 command set.
 
-**Note:** A significant change in commands took place in QDX firmware v1.06. The previous commands (from v1.03) are available with an underscore prefix for backwards compatibility. Upgrading to the latest QDX firmware is recommended. See the [QRPLabs QDX manual](http://qrp-labs.com/qdx) for upgrade instructions.
+**Note:** QDX firmware v1.06 or above is required, due to a significant change in commands in v1.06. See the [QRPLabs QDX manual](http://qrp-labs.com/qdx) for upgrade instructions.
 '''
 
 __docformat__ = 'google'
@@ -95,15 +95,6 @@ class QDX:
     | TX_STATE         | 'TQ'  | 1.03 |
     | TX_MODE          | 'TX'  | 1.03 |
     | VERSION          | 'VN'  | 1.05 |
-    | _RX_GAIN         | '_Q3' | 1.03 |
-    | _VOX_EN          | '_Q4' | 1.03 |
-    | _TX_RISE         | '_Q5' | 1.03 |
-    | _TX_FALL         | '_Q6' | 1.03 |
-    | _CYCLE_MIN       | '_Q7' | 1.03 |
-    | _SAMPLE_MIN      | '_Q8' | 1.03 |
-    | _DISCARD         | '_Q9' | 1.03 |
-    | _IQ_MODE         | '_QA' | 1.03 |
-    | _JAPAN_BAND_LIM  | '_QB' | 1.03 |
     
     Attributes:
         command_map (dict): map of command strings to associated data (see structure above)
@@ -143,15 +134,6 @@ class QDX:
     SERIAL3_BAUD     = 'QH'
     NIGHT_MODE       = 'QI'
     TX_SHIFT         = 'QJ'
-    _RX_GAIN         = '_Q3'
-    _VOX_EN          = '_Q4'
-    _TX_RISE         = '_Q5'
-    _TX_FALL         = '_Q6'
-    _CYCLE_MIN       = '_Q7'
-    _SAMPLE_MIN      = '_Q8'
-    _DISCARD         = '_Q9'
-    _IQ_MODE         = '_QA'
-    _JAPAN_BAND_LIM  = '_QB'
     NEG_RIT_OFFSET   = 'RD'
     RIT_STATUS       = 'RT'
     POS_RIT_OFFSET   = 'RU'
@@ -163,7 +145,7 @@ class QDX:
 
     COMMANDS = [AUDIO_GAIN, SIG_GEN_FREQ, VFO_A, VFO_B, RX_VFO_MODE, TX_VFO_MODE, FILTER_BW, RADIO_ID, RADIO_INFO, OPERATING_MODE, TXCO_FREQ, SIDEBAND, DEFAULT_FREQ, VOX_EN, TX_RISE,
         TX_FALL, CYCLE_MIN, SAMPLE_MIN, DISCARD, IQ_MODE, JAPAN_BAND_LIM, CAT_TIMEOUT_EN, CAT_TIMEOUT, PTT_PORT_SERIAL, VGA_PS2_MODE, SERIAL1_BAUD, SERIAL2_BAUD, SERIAL3_BAUD,
-        NIGHT_MODE, TX_SHIFT, _RX_GAIN, _VOX_EN, _TX_RISE, _TX_FALL, _CYCLE_MIN, _SAMPLE_MIN, _DISCARD, _IQ_MODE, _JAPAN_BAND_LIM, NEG_RIT_OFFSET, RIT_STATUS, POS_RIT_OFFSET,
+        NIGHT_MODE, TX_SHIFT, NEG_RIT_OFFSET, RIT_STATUS, POS_RIT_OFFSET,
         RX_MODE, SPLIT_MODE, TX_STATE, TX_MODE, VERSION]
 
     def __init__(self, port=None, autodetect=True):
@@ -177,7 +159,7 @@ class QDX:
             qdxcat.QDX: Constructed QDX object
         '''
         self.command_map = {
-            'AG' : {'get': self.get_af_gain,                   'set': self.set_af_gain,                'description': 'Audio Gain',          'unit': 'dB',       'options': None},
+            'AG' : {'get': self.get_audio_gain,                'set': self.set_audio_gain,             'description': 'Audio Gain',          'unit': 'dB',       'options': None},
             'C2' : {'get': self.get_sig_gen_freq,              'set': self.set_sig_gen_freq,           'description': 'Signal Gen',          'unit': 'Hz',       'options': None},
             'FA' : {'get': self.get_vfo_a,                     'set': self.set_vfo_a,                  'description': 'VFO A',               'unit': 'Hz',       'options': None},
             'FB' : {'get': self.get_vfo_b,                     'set': self.set_vfo_b,                  'description': 'VFO B',               'unit': 'Hz',       'options': None},
@@ -214,16 +196,7 @@ class QDX:
             'SP' : {'get': self.get_split_mode,                'set': self.set_split_mode,             'description': 'Split Mode',          'unit': '',         'options': {0:'Disabled', 1:'Enabled'}},
             'TQ' : {'get': self.get_tx_state,                  'set': self.set_tx_state,               'description': 'RX/TX State',         'unit': '',         'options': {0:'RX', 1:'TX'}},
             'TX' : {'get': None,                               'set': self.set_tx,                     'description': 'TX',                  'unit': '',         'options': None},
-            'VN' : {'get': self.get_version,                   'set': None,                            'description': 'Firmware Version',    'unit': '',         'options': None},
-            '_Q3' : {'get': self.get_rx_gain,                  'set': self.set_rx_gain,                'description': 'RX Gain',             'unit': '',         'options': None},
-            '_Q4' : {'get': self.get_vox_enable,               'set': self.set_vox_enable,             'description': 'VOX',                 'unit': '',         'options': {0:'Disabled', 1:'Enabled'}},
-            '_Q5' : {'get': self.get_tx_rise_threshold,        'set': self.set_tx_rise_threshold,      'description': 'TX Rise',             'unit': '%',        'options': None},
-            '_Q6' : {'get': self.get_tx_fall_threshold,        'set': self.set_tx_fall_threshold,      'description': 'TX Fall',             'unit': '%',        'options': None},
-            '_Q7' : {'get': self.get_cycle_min_parameter,      'set': self.set_cycle_min_parameter,    'description': 'Cycle Min',           'unit': 'cycles',   'options': None},
-            '_Q8' : {'get': self.get_sample_min_parameter,     'set': self.set_sample_min_parameter,   'description': 'Sample Min',          'unit': 'samples',  'options': None}, 
-            '_Q9' : {'get': self.get_discard_parameter,        'set': self.set_discard_parameter,      'description': 'Discard',             'unit': 'cycles',   'options': None},
-            '_QA' : {'get': self.get_iq_mode,                  'set': self.set_iq_mode,                'description': 'IQ Mode',             'unit': '',         'options': {0:'Disabled', 1:'Enabled'}},
-            '_QB' : {'get': self.get_japan_band_limit_mode,    'set': self.set_japan_band_limit_mode,  'description': 'Japan Band Mode',     'unit': '',         'options': {0:'Disabled', 1:'Enabled'}}
+            'VN' : {'get': self.get_version,                   'set': None,                            'description': 'Firmware Version',    'unit': '',         'options': None}
         }
 
         self.settings = {}
@@ -443,15 +416,15 @@ class QDX:
 
         return response
     
-    def get_af_gain(self):
-        gain = self._serial_request(QDX.AF_GAIN)
+    def get_audio_gain(self):
+        gain = self._serial_request(QDX.AUDIO_GAIN)
         if gain is not None:
             gain = int(gain)
         return gain
 
-    def set_af_gain(self, value):
+    def set_audio_gain(self, value):
         value = int(value)
-        self._serial_request(QDX.AF_GAIN, value)
+        self._serial_request(QDX.AUDIO_GAIN, value)
 
     def get_sig_gen_freq(self):
         freq = self._serial_request(QDX.SIG_GEN_FREQ)
