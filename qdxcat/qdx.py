@@ -210,6 +210,17 @@ class QDX:
             'TX' : {'description': 'TX',                  'unit': '',         'options': None},
             'VN' : {'description': 'Firmware Version',    'unit': '',         'options': None}
         }
+        '''
+        structure:
+        {
+            'CMD' : {
+                'description': Command description string
+                'units': Command units string, or empty string
+                'options': *dict* of command options and description strings, or None
+            },
+            ...
+        }
+        '''
 
         self._debug = False
         self.settings = {}
