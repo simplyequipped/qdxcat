@@ -2,7 +2,7 @@
 
 Implements CAT control for the  [QRPLabs QDX transceiver](http://qrp-labs.com/qdx).
 
-Serial port interfacing is cross-platform by the use of the pySerial package. The QDX serial port is auto-detected by default.
+Serial port interfacing is cross-platform via the pySerial package.
 
 ### Examples
 
@@ -12,13 +12,13 @@ import qdxcat
 qdx = qdxcat.QDX()
 ```
 
-Specify serial port:
+Specify serial port (Windows):
 ```
 import qdxcat
-qdx = qdxcat.QDX('/dev/ttyXXX')
+qdx = qdxcat.QDX('COM42')
 ```
 
-Disable auto-detect, specify serial port later:
+Disable auto-detect, specify serial port later (Unix):
 ```
 import qdxcat
 qdx = qdxcat.QDX(autodetect = False)
@@ -65,10 +65,10 @@ Install the *qdxcat* package and dependencies using *pip*:
 pip3 install qdxcat
 ```
 
-**Note:** Linux operating systems may require that a user be added to the *dialout* group to access serial ports without *sudo*. Check if the current user is a member of the *dialout* group using the `groups` terminal command. If *dialout* is not listed, add a user to the group using the following terminal command:
+**Note:** Linux operating systems may require that a user be added to the *dialout* group to access serial ports without *sudo*. Check if the current user is a member of the *dialout* group using the `groups` terminal command. If *dialout* is not listed, add the user *USERNAME* to the group using the following terminal command:
 
 ```
-sudo usermod -a -G dialout *user*
+sudo usermod -a -G dialout USERNAME
 ```
 
 A restart may be required for group changes to take effect.
