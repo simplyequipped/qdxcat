@@ -211,7 +211,8 @@ class QDX:
             'VN' : {'description': 'Firmware Version',    'unit': '',         'options': None}
         }
         '''
-        structure:
+        Dictionary structure:
+        ```
         {
             'CMD' : {
                 'description': Command description string
@@ -220,11 +221,22 @@ class QDX:
             },
             ...
         }
+        ```
         '''
 
-        self._debug = False
-        self.settings = {}
         self._settings_lock = threading.Lock()
+        self.settings = {}
+        '''
+        Dictionary structure:
+        ```
+        {
+            'CMD' : *value*,
+            ...
+        }
+        ```
+        '''
+        
+        self._debug = False
         
         # serial port config
         self._port = None
