@@ -316,8 +316,8 @@ class QDX:
             int: Command value
 
         Raises:
-            ValueError: Invalid QDX command
-            ValueError: Command is not settable (not in QDX.SET_COMMANDS)
+            ValueError: Invalid QDX command (not in QDX.COMMANDS)
+            ValueError: Command is not settable (not in QDX.GET_COMMANDS)
         '''
         if cmd not in QDX.COMMANDS:
             raise ValueError('Invalid QDX command: {}'.format(cmd))
@@ -341,7 +341,7 @@ class QDX:
             int: Command value
 
         Raises:
-            ValueError: Invalid QDX command
+            ValueError: Invalid QDX command (not in QDX.COMMANDS)
             ValueError: Command is not settable (not in QDX.SET_COMMANDS)
         '''
         if cmd not in QDX.COMMANDS:
@@ -360,7 +360,7 @@ class QDX:
             cmd (str): Command to sync
 
         Raises:
-            ValueError: Invalid QDX command
+            ValueError: Invalid QDX command (not in QDX.COMMANDS)
             ValueError: Error processing command
         '''
         with self._settings_lock:
