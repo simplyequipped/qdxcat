@@ -199,6 +199,7 @@ class QDX:
             'VN' : {'get': self.get_version,                   'set': None,                            'description': 'Firmware Version',    'unit': '',         'options': None}
         }
 
+        self._debug = False
         self.settings = {}
         self._settings_lock = threading.Lock()
         
@@ -382,6 +383,9 @@ class QDX:
         else:
             # 'get' command
             request = str(cmd) + ';'
+
+        if self._debug:
+            print( 'TX: {}'.format(request) )
             
         request = request.encode('utf-8')
                 
@@ -406,6 +410,9 @@ class QDX:
         response = response.decode('utf-8')
         # remove empty byte at the end of some returned values
         response = response.replace('\x00', '')
+
+        if self._debug:
+            print( 'RX: {}\n'.format(response) )
         
         # stop processing if the device did not understand the command
         if response == '?;':
