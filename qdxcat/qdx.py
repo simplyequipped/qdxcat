@@ -469,7 +469,7 @@ class QDX:
                 'tone_number': int(value[1][16])
             }
 
-        elif original_cmd == QDX.VERSION
+        elif original_cmd == QDX.VERSION:
             value = float( value.replace('_', '.') )
         
         return value
