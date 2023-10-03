@@ -71,6 +71,7 @@ class QDX:
     '''Same as QDX.RADIO_INFO, parsed into a dictionary
 
     Dictionary structure:
+    ```
     {
         'vfo_freq': int,
         'rit_offset': int,
@@ -87,6 +88,7 @@ class QDX:
         'tone': int,
         'tone_number': int
     }
+    ```
     '''
     OPERATING_MODE   = 'MD'
     '''Minimum firmware version: 1.03'''
