@@ -39,64 +39,8 @@ from serial.tools.list_ports import grep
 class QDX:
     '''QDX transceiver control object.
     
-    *command_map* structure:
-    ```
-    {
-        'CMD' : {
-            'description': Command description string
-            'units': Command units string, or empty string
-            'options': *dict* of command options and description strings, or None
-        },
-        ...
-    }
-    ```
-    
-    Supported Commands:
-    
-    | Command | Value | Minimum Firmware Version |
-    | -------- | -------- | -------- |
-    | AUDIO_GAIN       | 'AG'  | 1.03 |
-    | SIG_GEN_FREQ     | 'C2'  | 1.03 |
-    | VFO_A            | 'FA'  | 1.03 |
-    | VFO_B            | 'FB'  | 1.03 |
-    | RX_VFO_MODE      | 'FR'  | 1.03 |
-    | TX_VFO_MODE      | 'FT'  | 1.03 |
-    | FILTER_BW        | 'FW'  | 1.03 |
-    | RADIO_ID         | 'ID'  | 1.03 |
-    | RADIO_INFO       | 'IF'  | 1.03 |
-    | RADIO_INFO_DICT  | '_IF' | N/A  |
-    | OPERATING_MODE   | 'MD'  | 1.03 |
-    | TXCO_FREQ        | 'Q0'  | 1.03 |
-    | SIDEBAND         | 'Q1'  | 1.03 |
-    | DEFAULT_FREQ     | 'Q2'  | 1.03 |
-    | VOX_EN           | 'Q3'  | 1.06 |
-    | TX_RISE          | 'Q4'  | 1.06 |
-    | TX_FALL          | 'Q5'  | 1.06 |
-    | CYCLE_MIN        | 'Q6'  | 1.06 |
-    | SAMPLE_MIN       | 'Q7'  | 1.06 |
-    | DISCARD          | 'Q8'  | 1.06 |
-    | IQ_MODE          | 'Q9'  | 1.06 |
-    | JAPAN_BAND_LIM   | 'QA'  | 1.06 |
-    | CAT_TIMEOUT_EN   | 'QB'  | 1.06 |
-    | CAT_TIMEOUT      | 'QC'  | 1.06 |
-    | PTT_PORT_SERIAL  | 'QD'  | 1.06 |
-    | VGA_PS2_MODE     | 'QE'  | 1.06 |
-    | SERIAL1_BAUD     | 'QF'  | 1.06 |
-    | SERIAL2_BAUD     | 'QG'  | 1.06 |
-    | SERIAL3_BAUD     | 'QH'  | 1.06 |
-    | NIGHT_MODE       | 'QI'  | 1.06 |
-    | TX_SHIFT         | 'QJ'  | 1.06 |
-    | NEG_RIT_OFFSET   | 'RD'  | 1.03 |
-    | RIT_STATUS       | 'RT'  | 1.03 |
-    | POS_RIT_OFFSET   | 'RU'  | 1.03 |
-    | RX_MODE          | 'RX'  | 1.03 |
-    | SPLIT_MODE       | 'SP'  | 1.03 |
-    | TX_STATE         | 'TQ'  | 1.03 |
-    | TX_MODE          | 'TX'  | 1.03 |
-    | VERSION          | 'VN'  | 1.05 |
-    
     Attributes:
-        command_map (dict): map of command strings to associated data (see structure above)
+        command_map (dict): map of command strings to associated data
         settings (dict): map of commands and current local values
         COMMANDS (list): list of command strings
         GET_COMMANDS (list): list of command strings that support a *get* operation
@@ -106,44 +50,102 @@ class QDX:
     # QDX CAT commands
     # Kenwood TS-480/TS-440 command set
     AUDIO_GAIN       = 'AG'
+    '''Minimum firmware version: 1.03'''
     SIG_GEN_FREQ     = 'C2'
+    '''Minimum firmware version: 1.03'''
     VFO_A            = 'FA'
+    '''Minimum firmware version: 1.03'''
     VFO_B            = 'FB'
+    '''Minimum firmware version: 1.03'''
     RX_VFO_MODE      = 'FR'
+    '''Minimum firmware version: 1.03'''
     TX_VFO_MODE      = 'FT'
+    '''Minimum firmware version: 1.03'''
     FILTER_BW        = 'FW'
+    '''Minimum firmware version: 1.03'''
     RADIO_ID         = 'ID'
+    '''Minimum firmware version: 1.03'''
     RADIO_INFO       = 'IF'
+    '''Minimum firmware version: 1.03'''
     RADIO_INFO_DICT  = '_IF'
+    '''Same as QDX.RADIO_INFO, parsed into a dictionary
+
+    Dictionary structure:
+    {
+        'vfo_freq': int,
+        'rit_offset': int,
+        'rit': bool,
+        'xit': bool,
+        'memory_bank': int,
+        'memory_channel': int,
+        'tx': bool,
+        'rx': bool,
+        'mode': int,
+        'rx_vfo': int,
+        'scan': bool,
+        'split': bool,
+        'tone': int,
+        'tone_number': int
+    }
+    '''
     OPERATING_MODE   = 'MD'
+    '''Minimum firmware version: 1.03'''
     TXCO_FREQ        = 'Q0'
+    '''Minimum firmware version: 1.03'''
     SIDEBAND         = 'Q1'
+    '''Minimum firmware version: 1.03'''
     DEFAULT_FREQ     = 'Q2'
+    '''Minimum firmware version: 1.03'''
     VOX_EN           = 'Q3'
+    '''Minimum firmware version: 1.06'''
     TX_RISE          = 'Q4'
+    '''Minimum firmware version: 1.06'''
     TX_FALL          = 'Q5'
+    '''Minimum firmware version: 1.06'''
     CYCLE_MIN        = 'Q6'
+    '''Minimum firmware version: 1.06'''
     SAMPLE_MIN       = 'Q7'
+    '''Minimum firmware version: 1.06'''
     DISCARD          = 'Q8'
+    '''Minimum firmware version: 1.06'''
     IQ_MODE          = 'Q9'
+    '''Minimum firmware version: 1.06'''
     JAPAN_BAND_LIM   = 'QA'
+    '''Minimum firmware version: 1.06'''
     CAT_TIMEOUT_EN   = 'QB'
+    '''Minimum firmware version: 1.06'''
     CAT_TIMEOUT      = 'QC'
+    '''Minimum firmware version: 1.06'''
     PTT_PORT_SERIAL  = 'QD'
+    '''Minimum firmware version: 1.06'''
     VGA_PS2_MODE     = 'QE'
+    '''Minimum firmware version: 1.06'''
     SERIAL1_BAUD     = 'QF'
+    '''Minimum firmware version: 1.06'''
     SERIAL2_BAUD     = 'QG'
+    '''Minimum firmware version: 1.06'''
     SERIAL3_BAUD     = 'QH'
+    '''Minimum firmware version: 1.06'''
     NIGHT_MODE       = 'QI'
+    '''Minimum firmware version: 1.06'''
     TX_SHIFT         = 'QJ'
+    '''Minimum firmware version: 1.06'''
     NEG_RIT_OFFSET   = 'RD'
+    '''Minimum firmware version: 1.03'''
     RIT_STATUS       = 'RT'
+    '''Minimum firmware version: 1.03'''
     POS_RIT_OFFSET   = 'RU'
+    '''Minimum firmware version: 1.03'''
     RX_MODE          = 'RX'
+    '''Minimum firmware version: 1.03'''
     SPLIT_MODE       = 'SP'
+    '''Minimum firmware version: 1.03'''
     TX_STATE         = 'TQ'
+    '''Minimum firmware version: 1.03'''
     TX_MODE          = 'TX'
+    '''Minimum firmware version: 1.03'''
     VERSION          = 'VN'
+    '''Minimum firmware version: 1.05'''
 
     COMMANDS = [AUDIO_GAIN, SIG_GEN_FREQ, VFO_A, VFO_B, RX_VFO_MODE, TX_VFO_MODE, FILTER_BW, RADIO_ID, RADIO_INFO, RADIO_INFO_DICT, OPERATING_MODE,
         TXCO_FREQ, SIDEBAND, DEFAULT_FREQ, VOX_EN, TX_RISE, TX_FALL, CYCLE_MIN, SAMPLE_MIN, DISCARD, IQ_MODE, JAPAN_BAND_LIM, CAT_TIMEOUT_EN,
@@ -211,31 +213,35 @@ class QDX:
             'VN' : {'description': 'Firmware Version',    'unit': '',         'options': None}
         }
         '''
+        Map of commands to associated data.
+        
         Dictionary structure:
         ```
         {
             'CMD' : {
-                'description': Command description string
-                'units': Command units string, or empty string
-                'options': *dict* of command options and description strings, or None
+                'description': str, command description
+                'units': str, command units (empty string if not applicable)
+                'options': dict or None, dictionary of command options and description strings (None if no applicable)
             },
             ...
         }
         ```
         '''
 
-        self._settings_lock = threading.Lock()
         self.settings = {}
         '''
+        Local settings representation. Updated automatically when QDX.set() is called.
+        
         Dictionary structure:
         ```
         {
-            'CMD' : *value*,
+            'CMD' : int,
             ...
         }
         ```
         '''
         
+        self._settings_lock = threading.Lock()
         self._debug = False
         
         # serial port config
