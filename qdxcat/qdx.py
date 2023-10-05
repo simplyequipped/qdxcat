@@ -487,6 +487,8 @@ class QDX:
         elif '.' in response and response.replace('.', '', 1).replace('-', '', 1).isnumeric():
             # handle decimal point and negative sign in string
             value = float(response)
+        else:
+            value = response
 
         if original_cmd == QDX.RADIO_INFO_DICT:
             value = value.split('     ')
