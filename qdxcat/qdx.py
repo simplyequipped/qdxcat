@@ -268,11 +268,7 @@ class QDX:
             # try windows description
             ports = list( serial.tools.list_ports.grep('USB Serial Device') )
             
-        if len(ports) == 0:
-            # no matching device description on linux or windows
-            raise IOError('QDX device not found, check device connection or specifiy a serial port')
-
-        # check QDX radio ID (Kenwood TS-480 = 020)
+        # check QDX radio ID ( int('020') )
         for port in ports.copy():
             try:
                 if self._get(QDX.RADIO_ID, device = port.device) != 20:
@@ -282,10 +278,16 @@ class QDX:
                 ports.remove(port)
                 continue
 
+        if len(ports) == 0:
+            # no matching device description on linux or windows
+            raise IOError('QDX device not found, check device connection or specifiy a serial port')
+
         if len(ports) > 1:
             devices = ', '.join( [port.name for port in ports] )
             raise IOError('Multiple QDX devices found, try specifying a serial port: {}'.format(devices))
         
+        print(ports)
+
         self.set_port(ports[0].device)
 
     def set_port(self, port, baudrate=9600, timeout=1, sync=True):
