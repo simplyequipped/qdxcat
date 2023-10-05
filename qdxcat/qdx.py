@@ -237,7 +237,7 @@ class QDX:
         Dictionary structure:
         ```
         {
-            'CMD' : int,
+            'CMD' : int OR float OR str OR dict,
             ...
         }
         ```
