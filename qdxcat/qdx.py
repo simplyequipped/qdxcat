@@ -286,8 +286,6 @@ class QDX:
             devices = ', '.join( [port.name for port in ports] )
             raise IOError('Multiple QDX devices found, try specifying a serial port: {}'.format(devices))
         
-        print(ports)
-
         self.set_port(ports[0].device)
 
     def set_port(self, port, baudrate=9600, timeout=1, sync=True):
@@ -488,7 +486,7 @@ class QDX:
             # handle decimal point and negative sign in string
             value = float(response)
         else:
-            value = response
+            value = response.strip()
 
         if original_cmd == QDX.RADIO_INFO_DICT:
             value = value.split('     ')
