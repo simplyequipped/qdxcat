@@ -473,7 +473,7 @@ class QDX:
         request = '{};'.format(cmd)
         response = self._serial_request(request, device)
 
-        if value is None:
+        if response is None:
             return None
 
         # type conversion
