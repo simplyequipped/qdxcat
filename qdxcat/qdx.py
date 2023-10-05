@@ -272,10 +272,15 @@ class QDX:
             # no matching device description on linux or windows
             raise IOError('QDX device not found, check device connection or specifiy a serial port')
 
-        #TODO check radio ID string format
-        #TODO are there exceptions to handle when trying serial requests to unknown devices?
-        # check for QDX radio ID (Kenwood TS-480 = 020)
-        ports = [port for port in ports if self._serial_request(QDX.RADIO_ID, device = port.device) == '020']
+        # check QDX radio ID (Kenwood TS-480 = 020)
+        for port in ports.copy():
+            try:
+                if self._get(QDX.RADIO_ID, device = port.device) != 20:
+                    ports.remove(port)
+            except Exception as e:
+                # error occurred while getting radio ID, must not be a properly functioning QDX
+                ports.remove(port)
+                continue
 
         if len(ports) > 1:
             devices = ', '.join( [port.name for port in ports] )
@@ -322,7 +327,7 @@ class QDX:
         if cmd not in QDX.COMMANDS:
             raise ValueError('Invalid QDX command: {}'.format(cmd))
             
-        if cmd not in QDX.SET_COMMANDS:
+        if cmd not in QDX.GET_COMMANDS:
             raise ValueError('Command is not gettable: {}'.format(cmd))
             
         if update or cmd not in self.settings:
@@ -445,11 +450,12 @@ class QDX:
         response = response[2:-1]
         return response
 
-    def _get(self, cmd):
+    def _get(self, cmd, device=None):
         '''Low level *get* operation handling.
 
         Args:
             cmd (str): Command to get value for
+            device (str): Windows COM port (ex. 'COM42') or Unix serial device path (ex. '/dev/ttyACM0'), defaults to None
 
         Returns:
             int: Command value
@@ -465,7 +471,7 @@ class QDX:
         cmd = cmd.replace('_', '')
         
         request = '{};'.format(cmd)
-        response = self._serial_request(request)
+        response = self._serial_request(request, device)
 
         if value is None:
             return None
